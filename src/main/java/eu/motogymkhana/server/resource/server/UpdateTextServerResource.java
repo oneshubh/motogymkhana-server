@@ -30,7 +30,7 @@ public class UpdateTextServerResource extends ServerResource implements UpdateTe
 	@Post("json")
 	public void updateText(UpdateTextRequest request) {
 
-		if (pwManager.checkPassword(request.getCustomerCode(), request.getPassword())) {
+		if (pwManager.checkPassword(request.getCountry(), request.getPassword())) {
 			textManager.setText(request.getText());
 		}
 	}

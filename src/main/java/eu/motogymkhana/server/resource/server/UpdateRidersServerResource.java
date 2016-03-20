@@ -21,7 +21,7 @@ public class UpdateRidersServerResource extends ServerResource implements Update
 
 	@Inject
 	private RiderDao riderDao;
-	
+
 	@Inject
 	private PasswordManager pwManager;
 
@@ -39,7 +39,7 @@ public class UpdateRidersServerResource extends ServerResource implements Update
 
 		UploadRidersResponse response = new UploadRidersResponse();
 
-		if(!pwManager.checkPassword(request.getCustomerCode(), request.getPassword())){	
+		if (!pwManager.checkPassword(request.getCountry(), request.getPassword())) {
 			response.setStatus(404);
 			return response;
 		}
@@ -52,10 +52,12 @@ public class UpdateRidersServerResource extends ServerResource implements Update
 
 			response.setStatus(riderDao.updateRiders(request.getRiders()));
 			response.setNumberOfRiders(request.getRiders().size());
-			
+
 			em.getTransaction().commit();
+			response.setStatus(200);
 
 		} catch (Exception e) {
+			response.setStatus(500);
 			e.printStackTrace();
 			em.getTransaction().rollback();
 		}

@@ -39,11 +39,21 @@ public class Times {
 	private static final String DISQUALIFIED1 = "dis1";
 	private static final String DISQUALIFIED2 = "dis2";
 	private static final String TIMESTAMP = "timestamp";
+	private static final String COUNTRY = "country";
+	private static final String SEASON = "season";
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@JsonIgnore
 	private volatile int _id;
+
+	@JsonProperty(COUNTRY)
+	@Column(name = COUNTRY)
+	private Country country;
+
+	@JsonProperty(SEASON)
+	@Column(name = SEASON)
+	private int season;
 
 	@JsonProperty(TIMESTAMP)
 	@Column(name = TIMESTAMP)
@@ -90,9 +100,15 @@ public class Times {
 	private boolean registered = true;
 
 	@Transient
+	@JsonProperty(Rider.RIDER_NUMBER)
+	private int riderNumber;
+
+	@Transient
+	@JsonIgnore
 	private int points = 0;
 
 	@Transient
+	@JsonIgnore
 	private volatile int bestTimePlusPenalties;
 
 	public Times() {
@@ -303,6 +319,8 @@ public class Times {
 		registered = times.isRegistered();
 		timeStamp = times.getTimeStamp();
 		startNumber = times.getStartNumber();
+		country = times.getCountry();
+		season = times.getSeason();
 	}
 
 	public void setDate(long date) {
@@ -325,5 +343,25 @@ public class Times {
 	@Override
 	public int hashCode() {
 		return new HashCodeBuilder(17, 37).append(date).toHashCode();
+	}
+
+	public Country getCountry() {
+		return country;
+	}
+
+	public int getSeason() {
+		return season;
+	}
+
+	public void setCountry(Country country) {
+		this.country = country;
+	}
+
+	public void setSeason(int season) {
+		this.season = season;
+	}
+
+	public int getRiderNumber() {
+		return riderNumber;
 	}
 }

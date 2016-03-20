@@ -1,14 +1,13 @@
 package eu.motogymkhana.server.round;
 
 import java.util.Collection;
-import java.util.List;
 
-import eu.motogymkhana.server.model.Rider;
+import eu.motogymkhana.server.model.Country;
 import eu.motogymkhana.server.model.Round;
 
 public interface RoundManager {
 
-	Round getCurrentRound();
+	Round getCurrentRound(Country country, int season);
 
-	Collection<Round> getRounds();
+	Collection<Round> getRounds(Country country, int season);
 }

@@ -5,7 +5,7 @@ package eu.motogymkhana.server.model;
  */
 public enum Bib {
 
-	Y(""), G("G"), R("R");
+	Y(""), G("G"), B("B"), R("R");
 
 	private String string;
 

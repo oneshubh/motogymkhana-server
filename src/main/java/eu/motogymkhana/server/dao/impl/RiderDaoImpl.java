@@ -13,8 +13,8 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 
 import eu.motogymkhana.server.dao.RiderDao;
-import eu.motogymkhana.server.dao.TimesDao;
 import eu.motogymkhana.server.guice.InjectLogger;
+import eu.motogymkhana.server.model.Country;
 import eu.motogymkhana.server.model.Rider;
 import eu.motogymkhana.server.model.Round;
 import eu.motogymkhana.server.model.Times;
@@ -38,14 +38,18 @@ public class RiderDaoImpl implements RiderDao {
 
 		try {
 
-			TypedQuery<Rider> query = em.createQuery(
-					"select a from " + Rider.class.getSimpleName()
-							+ " a where a.riderNumber = :number", Rider.class);
+			TypedQuery<Rider> query = em
+					.createQuery(
+							"select a from "
+									+ Rider.class.getSimpleName()
+									+ " a where a.riderNumber = :number and a.country = :country and a.season = :season",
+							Rider.class);
 			Rider existingRider = null;
 
 			try {
-				existingRider = query.setParameter("number", rider.getRiderNumber())
-						.getSingleResult();
+				existingRider = query.setParameter("country", rider.getCountry())
+						.setParameter("season", rider.getSeason())
+						.setParameter("number", rider.getRiderNumber()).getSingleResult();
 
 			} catch (NoResultException nre) {
 			}
@@ -58,10 +62,10 @@ public class RiderDaoImpl implements RiderDao {
 				}
 
 			} else {
-			
+
 				existingRider.merge(rider);
 			}
-		
+
 		} catch (Exception e) {
 			e.printStackTrace();
 			return -1;
@@ -71,7 +75,7 @@ public class RiderDaoImpl implements RiderDao {
 	}
 
 	@Override
-	public int uploadRiders(List<Rider> riders) {
+	public int uploadRiders(Country country, int season, List<Rider> riders) {
 
 		EntityManager em = emp.get();
 
@@ -79,7 +83,7 @@ public class RiderDaoImpl implements RiderDao {
 
 			for (Rider rider : riders) {
 
-				Rider r = getRiderForNumber(rider.getRiderNumber());
+				Rider r = getRiderForNumber(country, season, rider.getRiderNumber());
 
 				if (r != null) {
 					em.remove(r);
@@ -104,8 +108,6 @@ public class RiderDaoImpl implements RiderDao {
 	@Override
 	public int updateRiders(List<Rider> riders) {
 
-		EntityManager em = emp.get();
-
 		try {
 
 			for (Rider rider : riders) {
@@ -122,16 +124,22 @@ public class RiderDaoImpl implements RiderDao {
 		return -1;
 	}
 
-	private Rider getRiderForNumber(int riderNumber) {
+	@Override
+	public Rider getRiderForNumber(Country country, int season, int riderNumber) {
 
 		EntityManager em = emp.get();
 		Rider existingRider = null;
 
-		TypedQuery<Rider> query = em.createQuery("select a from " + Rider.class.getSimpleName()
-				+ " a where a.riderNumber = :number", Rider.class);
+		TypedQuery<Rider> query = em
+				.createQuery(
+						"select a from "
+								+ Rider.class.getSimpleName()
+								+ " a where a.riderNumber = :number and a.country = :country and a.season = :season",
+						Rider.class);
 
 		try {
-			existingRider = query.setParameter("number", riderNumber).getSingleResult();
+			existingRider = query.setParameter("country", country).setParameter("season", season)
+					.setParameter("number", riderNumber).getSingleResult();
 
 		} catch (NoResultException nre) {
 		}
@@ -140,14 +148,15 @@ public class RiderDaoImpl implements RiderDao {
 	}
 
 	@Override
-	public List<Rider> getRiders() {
+	public List<Rider> getRiders(Country country, int year) {
 
 		EntityManager em = emp.get();
 
 		TypedQuery<Rider> query = em.createQuery("select a from " + Rider.class.getSimpleName()
-				+ " a", Rider.class);
+				+ " a where a.country = :country and a.season = :season", Rider.class);
 
-		List<Rider> riders = query.getResultList();
+		List<Rider> riders = query.setParameter("country", country)
+				.setParameter("season", year).getResultList();
 
 		List<Rider> result = new ArrayList<Rider>();
 
@@ -169,12 +178,14 @@ public class RiderDaoImpl implements RiderDao {
 
 			TypedQuery<Rider> query = emp.get().createQuery(
 					"select a from " + Rider.class.getSimpleName()
-							+ " a where a.riderNumber = :number", Rider.class);
+							+ " a where a.riderNumber = :number and a.country = :country",
+					Rider.class);
 			Rider existingRider = null;
 
 			try {
 				existingRider = query.setParameter("number", rider.getRiderNumber())
-						.getSingleResult();
+						.setParameter("country", rider.getCountry())
+						.setParameter("season", rider.getSeason()).getSingleResult();
 
 			} catch (NoResultException nre) {
 			}
@@ -200,20 +211,26 @@ public class RiderDaoImpl implements RiderDao {
 		EntityManager em = emp.get();
 
 		if (round == null) {
-			return getRiders();
+			return riders;
 		}
 
 		try {
 
-			TypedQuery<Times> query = em.createQuery("select a from " + Times.class.getSimpleName()
-					+ " a where a.registered = :registered and a.date = :date", Times.class);
+			TypedQuery<Times> query = em
+					.createQuery(
+							"select a from "
+									+ Times.class.getSimpleName()
+									+ " a where a.registered = :registered and a.date = :date and a.country = :country and a.season = :season",
+							Times.class);
 
 			Times times = null;
 
 			try {
 
 				times = query.setParameter("registered", true)
-						.setParameter("date", round.getDate()).getSingleResult();
+						.setParameter("date", round.getDate())
+						.setParameter("country", round.getCountry())
+						.setParameter("season", round.getSeason()).getSingleResult();
 
 				if (times != null) {
 					riders.add(times.getRider());

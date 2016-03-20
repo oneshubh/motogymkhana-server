@@ -4,6 +4,7 @@ public class UploadRidersResponse {
 
 	private int status;
 	private int numberOfRiders;
+	
 	public int getStatus() {
 		return status;
 	}

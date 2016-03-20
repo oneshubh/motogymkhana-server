@@ -9,12 +9,16 @@ import com.google.inject.matcher.Matcher;
 import com.google.inject.matcher.Matchers;
 
 import eu.motogymkhana.server.dao.PasswordDao;
+import eu.motogymkhana.server.dao.RiderAuthDao;
 import eu.motogymkhana.server.dao.RiderDao;
 import eu.motogymkhana.server.dao.RoundDao;
+import eu.motogymkhana.server.dao.SettingsDao;
 import eu.motogymkhana.server.dao.TimesDao;
 import eu.motogymkhana.server.dao.impl.PasswordDaoImpl;
+import eu.motogymkhana.server.dao.impl.RiderAuthDaoImpl;
 import eu.motogymkhana.server.dao.impl.RiderDaoImpl;
 import eu.motogymkhana.server.dao.impl.RoundDaoImpl;
+import eu.motogymkhana.server.dao.impl.SettingsDaoImpl;
 import eu.motogymkhana.server.dao.impl.TimesDaoImpl;
 import eu.motogymkhana.server.http.HttpClientProvider;
 import eu.motogymkhana.server.http.MyHttpClient;
@@ -44,6 +48,8 @@ public class GymkhanaModule extends AbstractModule {
 		bind(TimesDao.class).to(TimesDaoImpl.class);
 		bind(RiderDao.class).to(RiderDaoImpl.class);
 		bind(PasswordDao.class).to(PasswordDaoImpl.class);
+		bind(SettingsDao.class).to(SettingsDaoImpl.class);
+		bind(RiderAuthDao.class).to(RiderAuthDaoImpl.class);
 		
 		bind(TextManager.class).to(TextManagerImpl.class);
 		bind(RoundManager.class).to(RoundManagerImpl.class);

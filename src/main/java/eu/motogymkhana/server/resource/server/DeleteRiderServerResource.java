@@ -42,7 +42,7 @@ public class DeleteRiderServerResource extends ServerResource implements DeleteR
 
 		UpdateRiderResponse response = new UpdateRiderResponse();
 		
-		if(!pwManager.checkPassword(request.getCustomerCode(), request.getPassword())){	
+		if(!pwManager.checkPassword(request.getCountry(), request.getPassword())){	
 			response.setStatus(404);
 			return response;
 		}

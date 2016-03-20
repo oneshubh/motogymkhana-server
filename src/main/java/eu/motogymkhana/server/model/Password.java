@@ -2,6 +2,8 @@ package eu.motogymkhana.server.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -9,11 +11,18 @@ import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+/**
+ * file with user ids and passwords for app admins. Pwhash for my 
+ * password is aVPXVxwCy9tyU+RqbtLLsjwbtE40z9ZTDEvbubQ8I/c= (that is
+ * the content of the password field in the database)
+ * @author christine
+ *
+ */
 @Entity
 @Table(name = "passwords")
 public class Password {
 
-	public static final String CUSTOMER_CODE = "customer_code";
+	public static final String COUNTRY = "country";
 	public static final String PW_HASH = "pw_hash";
 
 	@Id
@@ -21,8 +30,8 @@ public class Password {
 	@JsonIgnore
 	private int _id;
 
-	@Column(name = CUSTOMER_CODE)
-	private String customerCode;
+	@Column(name = COUNTRY)
+	private Country country;
 
 	@Column(name = PW_HASH)
 	private String passwordHash;
@@ -30,17 +39,17 @@ public class Password {
 	public Password() {
 	}
 	
-	public Password(String customerCode, String password) {
-		this.customerCode=customerCode;
+	public Password(Country country, String password) {
+		this.country=country;
 		this.passwordHash=password;
 	}
 
-	public String getCustomerCode() {
-		return customerCode;
+	public Country getCountry() {
+		return country;
 	}
 
-	public void setCustomerCode(String customerCode) {
-		this.customerCode = customerCode;
+	public void setCountry(Country country) {
+		this.country = country;
 	}
 
 	public String getPasswordHash() {

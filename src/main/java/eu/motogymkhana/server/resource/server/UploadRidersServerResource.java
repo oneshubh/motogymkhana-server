@@ -21,7 +21,7 @@ public class UploadRidersServerResource extends ServerResource implements Upload
 
 	@Inject
 	private RiderDao riderDao;
-	
+
 	@Inject
 	private PasswordManager pwManager;
 
@@ -38,8 +38,8 @@ public class UploadRidersServerResource extends ServerResource implements Upload
 	public UploadRidersResponse uploadRiders(UploadRidersRequest request) {
 
 		UploadRidersResponse response = new UploadRidersResponse();
-		
-		if(!pwManager.checkPassword(request.getCustomerCode(), request.getPassword())){	
+
+		if (!pwManager.checkPassword(request.getCountry(), request.getPassword())) {
 			response.setStatus(404);
 			return response;
 		}
@@ -50,9 +50,10 @@ public class UploadRidersServerResource extends ServerResource implements Upload
 
 		try {
 
-			response.setStatus(riderDao.uploadRiders(request.getRiders()));
+			response.setStatus(riderDao.uploadRiders(request.getCountry(), request.getSeason(),
+					request.getRiders()));
 			response.setNumberOfRiders(request.getRiders().size());
-			
+
 			em.getTransaction().commit();
 
 		} catch (Exception e) {

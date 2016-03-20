@@ -1,9 +1,10 @@
 package eu.motogymkhana.server.dao;
 
+import eu.motogymkhana.server.model.Country;
 
 public interface PasswordDao {
 
-	boolean checkPasswordHash(String customerCode, String passwordHash);
+	boolean checkPasswordHash(Country country, String passwordHash);
 
-	void store(String customerCode, String hash);
+	void store(Country country, String hash);
 }

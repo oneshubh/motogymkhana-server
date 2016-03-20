@@ -21,7 +21,7 @@ public class CheckPasswordServerResource extends ServerResource implements Check
 
 		GymkhanaResult result = new GymkhanaResult();
 
-		boolean b = passwordManager.checkPassword(request.getCustomerCode(), request.getPassword());
+		boolean b = passwordManager.checkPassword(request.getCountry(), request.getPassword());
 		result.setResultCode(b ? 0 : -1);
 
 		return result;

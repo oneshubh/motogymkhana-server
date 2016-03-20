@@ -15,9 +15,11 @@ import org.junit.runner.RunWith;
 
 import com.google.inject.Inject;
 
+import eu.motogymkhana.server.api.GymkhanaRequest;
 import eu.motogymkhana.server.api.ListRidersResult;
 import eu.motogymkhana.server.api.UpdateRiderRequest;
 import eu.motogymkhana.server.api.UploadRidersRequest;
+import eu.motogymkhana.server.model.Country;
 import eu.motogymkhana.server.model.Rider;
 import eu.motogymkhana.server.model.Round;
 import eu.motogymkhana.server.model.Times;
@@ -55,8 +57,10 @@ public class UploadRidersTest {
 		rider.addTimes(times);
 
 		updateRiderResource.updateRider(new UpdateRiderRequest(rider));
+		
+		GymkhanaRequest request = new GymkhanaRequest(Country.NL, 2016);
 
-		ListRidersResult result = getRidersResource.getRiders();
+		ListRidersResult result = getRidersResource.getRiders(request);
 		Collection<Rider> riders = result.getRiders();
 
 		Assert.assertNotNull(riders);
@@ -101,7 +105,8 @@ public class UploadRidersTest {
 
 		uploadRidersResource.uploadRiders(new UploadRidersRequest(riders));
 
-		Collection<Rider> result = getRidersResource.getRiders().getRiders();
+		GymkhanaRequest request = new GymkhanaRequest(Country.NL, 2016);
+		Collection<Rider> result = getRidersResource.getRiders(request).getRiders();
 
 		Assert.assertNotNull(result);
 		Assert.assertEquals(3, result.size());

@@ -11,10 +11,13 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -25,8 +28,6 @@ import org.apache.commons.logging.LogFactory;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-import eu.motogymkhana.server.GymkhanaServer;
 
 @Entity
 @Table(name = "riders")
@@ -43,17 +44,48 @@ public class Rider {
 	public static final String GENDER = "gender";
 	public static final String DATE_OF_BIRTH = "dob";
 	public static final String COUNTRY = "country";
+	public static final String NATIONALITY = "nationality";
 	public static final String BIB = "bib";
 	public static final String TEXT = "text";
 	public static final String TIMES = "times";
-	private static final String TIMESTAMP = "timestamp";
+	public static final String TIMESTAMP = "timestamp";
+	public static final String SEASON = "season";
+	public static final String BIKE = "bike";
+	public static final String IMAGE_URL = "image_url";
+	public static final String BIKE_IMAGE_URL = "bike_image_url";
+	public static final String EMAIL = "email";
 
-	private static final int roundsCountingForSeasonResult = 4;
+	private static final int roundsCountingForSeasonResult = 6;
+
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@JsonIgnore
 	private int _id;
+
+	@JsonProperty(SEASON)
+	@Column(name = SEASON)
+	private int season;
+
+	@JsonProperty(COUNTRY)
+	@Column(name = COUNTRY)
+	private Country country;
+
+	@JsonProperty(NATIONALITY)
+	@Column(name = NATIONALITY)
+	private Country nationality;
+
+	@JsonProperty(BIKE)
+	@Column(name = BIKE)
+	private String bike;
+
+	@JsonProperty(IMAGE_URL)
+	@Column(name = IMAGE_URL)
+	private String imageUrl;
+
+	@JsonProperty(BIKE_IMAGE_URL)
+	@Column(name = BIKE_IMAGE_URL)
+	private String bikeImageUrl;
 
 	@JsonProperty(TIMESTAMP)
 	@Column(name = TIMESTAMP)
@@ -66,6 +98,10 @@ public class Rider {
 	@JsonProperty(LASTNAME)
 	@Column(name = LASTNAME)
 	private String lastName;
+	
+	@JsonProperty(EMAIL)
+	@Column(name = EMAIL)
+	private String email;
 
 	@JsonProperty(RIDER_NUMBER)
 	@Column(name = RIDER_NUMBER)
@@ -83,10 +119,6 @@ public class Rider {
 	@Column(name = DATE_OF_BIRTH)
 	private String dateOfBirth;
 
-	@JsonProperty(COUNTRY)
-	@Column(name = COUNTRY)
-	private Country country;
-
 	@JsonProperty(BIB)
 	@Column(name = BIB)
 	private Bib bib;
@@ -102,6 +134,10 @@ public class Rider {
 	@Column(name = POINTS)
 	@JsonIgnore
 	private int totalPoints;
+	
+	@JsonIgnore
+	@ManyToOne(cascade = CascadeType.ALL)
+	private RiderAuth riderAuth;
 
 	@Transient
 	@JsonIgnore
@@ -178,11 +214,7 @@ public class Rider {
 				}
 			}
 		}
-
-		Times times = new Times(date);
-		timesList.add(times);
-
-		return times;
+		return null;
 	}
 
 	public Collection<Times> getTimes() {
@@ -372,6 +404,8 @@ public class Rider {
 		totalPoints = rider.getTotalPoints();
 		dayRider = rider.isDayRider();
 		country = rider.getCountry();
+		nationality = rider.getNationality();
+		season = rider.getSeason();
 		gender = rider.getGender();
 		bib = rider.getBib();
 
@@ -410,11 +444,15 @@ public class Rider {
 		}
 	}
 
+	private Country getNationality() {
+		return nationality;
+	}
+
 	private Bib getBib() {
 		return bib;
 	}
 
-	private Country getCountry() {
+	public Country getCountry() {
 		return country;
 	}
 
@@ -442,4 +480,15 @@ public class Rider {
 		return timeStamp;
 	}
 
+	public int getSeason() {
+		return season;
+	}
+
+	public void setCountry(Country country) {
+		this.country=country;
+	}
+
+	public void setSeason(int season) {
+		this.season = season;
+	}
 }

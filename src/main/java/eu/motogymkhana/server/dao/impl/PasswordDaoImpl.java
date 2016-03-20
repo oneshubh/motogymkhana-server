@@ -12,6 +12,7 @@ import com.google.inject.Provider;
 
 import eu.motogymkhana.server.dao.PasswordDao;
 import eu.motogymkhana.server.guice.InjectLogger;
+import eu.motogymkhana.server.model.Country;
 import eu.motogymkhana.server.model.Password;
 
 public class PasswordDaoImpl implements PasswordDao {
@@ -27,28 +28,28 @@ public class PasswordDaoImpl implements PasswordDao {
 	}
 
 	@Override
-	public boolean checkPasswordHash(String customerCode, String hash) {
+	public boolean checkPasswordHash(Country country, String hash) {
 
 		EntityManager em = emp.get();
 
 		TypedQuery<Password> query = em.createQuery(
 				"select a from " + Password.class.getSimpleName() + " a where "
-						+ Password.CUSTOMER_CODE + " = :code", Password.class);
+						+ Password.COUNTRY + " = :code", Password.class);
 
-		List<Password> passwords = query.setParameter("code", customerCode).getResultList();
+		List<Password> passwords = query.setParameter("code", country).getResultList();
 
 		return passwords != null && passwords.size() > 0
 				&& passwords.get(0).getPasswordHash().equals(hash);
 	}
 
 	@Override
-	public void store(String customerCode, String hash) {
+	public void store(Country country, String hash) {
 
 		EntityManager em = emp.get();
 
 		em.getTransaction().begin();
 
-		em.persist(new Password(customerCode, hash));
+		em.persist(new Password(country, hash));
 
 		em.getTransaction().commit();
 	}

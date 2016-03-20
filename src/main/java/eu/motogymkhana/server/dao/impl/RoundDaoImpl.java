@@ -15,6 +15,7 @@ import com.google.inject.Provider;
 
 import eu.motogymkhana.server.dao.RoundDao;
 import eu.motogymkhana.server.guice.InjectLogger;
+import eu.motogymkhana.server.model.Country;
 import eu.motogymkhana.server.model.Round;
 
 public class RoundDaoImpl implements RoundDao {
@@ -88,14 +89,15 @@ public class RoundDaoImpl implements RoundDao {
 	}
 
 	@Override
-	public Collection<Round> getRounds() {
+	public Collection<Round> getRounds(Country country, int season) {
 
 		EntityManager em = emp.get();
 
 		TypedQuery<Round> query = em.createQuery("select a from " + Round.class.getSimpleName()
-				+ " a", Round.class);
+				+ " a where a.season = :season and a.country = :country", Round.class);
 
-		List<Round> rounds = query.getResultList();
+		List<Round> rounds = query.setParameter("country", country).setParameter("season", season)
+				.getResultList();
 
 		return rounds;
 	}

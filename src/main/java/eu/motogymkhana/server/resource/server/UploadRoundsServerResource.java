@@ -39,7 +39,7 @@ public class UploadRoundsServerResource extends ServerResource implements Upload
 
 		UploadRoundsResponse response = new UploadRoundsResponse();
 		
-		if(!pwManager.checkPassword(request.getCustomerCode(), request.getPassword())){	
+		if(!pwManager.checkPassword(request.getCountry(), request.getPassword())){	
 			response.setStatus(404);
 			return response;
 		}

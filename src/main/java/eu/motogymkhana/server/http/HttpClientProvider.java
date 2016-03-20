@@ -66,7 +66,6 @@ public class HttpClientProvider implements Provider<HttpClient> {
 					return super.resolve(host);
 				}
 			}
-
 		};
 
 		PoolingHttpClientConnectionManager connManager = new PoolingHttpClientConnectionManager(

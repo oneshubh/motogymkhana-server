@@ -5,6 +5,7 @@ import java.util.Collection;
 import com.google.inject.Inject;
 
 import eu.motogymkhana.server.dao.RoundDao;
+import eu.motogymkhana.server.model.Country;
 import eu.motogymkhana.server.model.Round;
 import eu.motogymkhana.server.round.RoundManager;
 
@@ -14,13 +15,13 @@ public class RoundManagerImpl implements RoundManager {
 	private RoundDao roundDao;
 
 	@Override
-	public Round getCurrentRound() {
+	public Round getCurrentRound(Country country, int season) {
 
 		long yesterday = System.currentTimeMillis() - (24l * 3600l * 1000l);
 
-		Round round =null;
+		Round round = null;
 
-		Collection<Round> rounds = roundDao.getRounds();
+		Collection<Round> rounds = roundDao.getRounds(country, season);
 
 		if (rounds != null && rounds.size() > 0) {
 			for (Round r : rounds) {
@@ -30,12 +31,12 @@ public class RoundManagerImpl implements RoundManager {
 				}
 			}
 		}
-		
+
 		return round;
 	}
 
 	@Override
-	public Collection<Round> getRounds() {
-		return roundDao.getRounds();
+	public Collection<Round> getRounds(Country country, int season) {
+		return roundDao.getRounds(country, season);
 	}
 }
