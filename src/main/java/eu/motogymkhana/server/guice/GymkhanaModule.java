@@ -2,6 +2,7 @@ package eu.motogymkhana.server.guice;
 
 import org.apache.http.client.HttpClient;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.AbstractModule;
 import com.google.inject.TypeLiteral;
 import com.google.inject.matcher.AbstractMatcher;
@@ -22,7 +23,10 @@ import eu.motogymkhana.server.dao.impl.SettingsDaoImpl;
 import eu.motogymkhana.server.dao.impl.TimesDaoImpl;
 import eu.motogymkhana.server.http.HttpClientProvider;
 import eu.motogymkhana.server.http.MyHttpClient;
+import eu.motogymkhana.server.http.UrlHelper;
 import eu.motogymkhana.server.http.impl.MyHttpClientImpl;
+import eu.motogymkhana.server.http.impl.UrlHelperImpl;
+import eu.motogymkhana.server.jackson.ObjectMapperProvider;
 import eu.motogymkhana.server.jpa.EntityManagerHelper;
 import eu.motogymkhana.server.jpa.impl.EntityManagerHelperImpl;
 import eu.motogymkhana.server.password.PasswordManager;
@@ -31,6 +35,8 @@ import eu.motogymkhana.server.round.RoundManager;
 import eu.motogymkhana.server.round.impl.RoundManagerImpl;
 import eu.motogymkhana.server.text.TextManager;
 import eu.motogymkhana.server.text.impl.TextManagerImpl;
+import eu.motogymkhana.server.timer.TimerManager;
+import eu.motogymkhana.server.timer.impl.TimerManagerImpl;
 
 /**
  * 
@@ -56,8 +62,12 @@ public class GymkhanaModule extends AbstractModule {
 	
 		bind(HttpClient.class).toProvider(HttpClientProvider.class);
 		bind(MyHttpClient.class).to(MyHttpClientImpl.class);
+		bind(UrlHelper.class).to(UrlHelperImpl.class);
+		
+		bind(ObjectMapper.class).toProvider(ObjectMapperProvider.class);
 
 		bind(PasswordManager.class).to(PasswordManagerImpl.class);
+		bind(TimerManager.class).to(TimerManagerImpl.class);
 		
 		//bind(ApplicationManager.class).to(ApplicationManagerImpl.class);
 

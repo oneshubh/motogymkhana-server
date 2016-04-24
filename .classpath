@@ -18,11 +18,6 @@
 	<classpathentry kind="lib" path="lib/guice-assistedinject-3.0.jar"/>
 	<classpathentry kind="lib" path="lib/guice-multibindings-3.0.jar"/>
 	<classpathentry kind="lib" path="lib/guice-persist-3.0.jar"/>
-	<classpathentry kind="lib" path="lib/httpclient-4.3.2.jar"/>
-	<classpathentry kind="lib" path="lib/httpclient-cache-4.3.2.jar"/>
-	<classpathentry kind="lib" path="lib/httpcore-4.3.2.jar"/>
-	<classpathentry kind="lib" path="lib/httpcore-ab-4.3.2.jar"/>
-	<classpathentry kind="lib" path="lib/httpmime-4.3.2.jar"/>
 	<classpathentry kind="lib" path="lib/java-image-scaling-0.8.5.jar"/>
 	<classpathentry kind="lib" path="lib/javax.inject.jar"/>
 	<classpathentry kind="lib" path="lib/javax.persistence-2.0.3.jar"/>
@@ -39,10 +34,7 @@
 	<classpathentry kind="lib" path="lib/restlet/org.restlet.ext.simple.jar"/>
 	<classpathentry kind="lib" path="lib/restlet/org.restlet.jar"/>
 	<classpathentry kind="lib" path="lib/restlet/org.simpleframework.jar"/>
-	<classpathentry kind="lib" path="lib/jackson/com.fasterxml.jackson.annotations.jar"/>
-	<classpathentry kind="lib" path="lib/jackson/com.fasterxml.jackson.core.jar"/>
 	<classpathentry kind="lib" path="lib/jackson/com.fasterxml.jackson.csv.jar"/>
-	<classpathentry kind="lib" path="lib/jackson/com.fasterxml.jackson.databind.jar"/>
 	<classpathentry kind="lib" path="lib/jackson/com.fasterxml.jackson.jaxb.jar"/>
 	<classpathentry kind="lib" path="lib/jackson/com.fasterxml.jackson.smile.jar"/>
 	<classpathentry kind="lib" path="lib/jackson/com.fasterxml.jackson.xml.jar"/>
@@ -59,5 +51,14 @@
 	<classpathentry kind="lib" path="lib/hibernate/dom4j-1.6.1.jar"/>
 	<classpathentry kind="lib" path="lib/hibernate/hibernate-validator-4.2.0.Final.jar"/>
 	<classpathentry kind="lib" path="lib/commons-daemon-1.0.15.jar"/>
+	<classpathentry kind="lib" path="lib/commons-lang3-3.1.jar"/>
+	<classpathentry kind="lib" path="lib/httpclient-4.3.2.jar"/>
+	<classpathentry kind="lib" path="lib/httpclient-cache-4.3.2.jar"/>
+	<classpathentry kind="lib" path="lib/httpcore-4.3.2.jar"/>
+	<classpathentry kind="lib" path="lib/httpcore-ab-4.3.2.jar"/>
+	<classpathentry kind="lib" path="lib/httpmime-4.3.2.jar"/>
+	<classpathentry kind="lib" path="lib/jackson/jackson-annotations-2.7.0.jar"/>
+	<classpathentry kind="lib" path="lib/jackson/jackson-core-2.7.0.jar"/>
+	<classpathentry kind="lib" path="lib/jackson/jackson-databind-2.7.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

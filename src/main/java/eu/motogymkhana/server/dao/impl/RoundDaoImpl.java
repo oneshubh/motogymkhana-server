@@ -54,13 +54,19 @@ public class RoundDaoImpl implements RoundDao {
 
 		try {
 
-			TypedQuery<Round> query = emp.get().createQuery(
-					"select a from " + Round.class.getSimpleName() + " a where a.number = :number",
-					Round.class);
+			TypedQuery<Round> query = emp
+					.get()
+					.createQuery(
+							"select a from "
+									+ Round.class.getSimpleName()
+									+ " a where a.country = :country and a.season = :season and a.date = :date",
+							Round.class);
 			Round existingRound = null;
 
 			try {
-				existingRound = query.setParameter("number", round.getNumber()).getSingleResult();
+				existingRound = query.setParameter("date", round.getDate())
+						.setParameter("country", round.getCountry())
+						.setParameter("season", round.getSeason()).getSingleResult();
 
 			} catch (NoResultException nre) {
 			}

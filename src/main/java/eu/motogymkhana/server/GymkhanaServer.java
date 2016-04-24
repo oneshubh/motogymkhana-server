@@ -23,6 +23,7 @@ import com.google.inject.persist.jpa.JpaPersistModule;
 
 import eu.motogymkhana.server.guice.GymkhanaModule;
 import eu.motogymkhana.server.jackson.MyJacksonConverter;
+import eu.motogymkhana.server.password.PasswordManager;
 import eu.motogymkhana.server.persist.PersistenceInitializer;
 import eu.motogymkhana.server.resource.server.CheckPasswordServerResource;
 import eu.motogymkhana.server.resource.server.DeleteRiderServerResource;
@@ -39,6 +40,7 @@ import eu.motogymkhana.server.resource.server.UploadRoundsServerResource;
 import eu.motogymkhana.server.resource.ui.RegisterRiderResource;
 import eu.motogymkhana.server.resource.ui.SendRiderTokenResource;
 import eu.motogymkhana.server.resource.ui.server.ShowRidersServerResource;
+import eu.motogymkhana.server.timer.TimerManager;
 
 public class GymkhanaServer extends Application {
 
@@ -54,6 +56,7 @@ public class GymkhanaServer extends Application {
 
 		Injector injector = RestletGuice.createInjector(new GymkhanaModule(), new JpaPersistModule(
 				"gymkhana-db"));
+
 		injector.getInstance(PersistenceInitializer.class);
 
 		FinderFactory ff = injector.getInstance(FinderFactory.class);
@@ -101,6 +104,8 @@ public class GymkhanaServer extends Application {
 		mainComponent.start();
 
 		replaceConverter(JacksonConverter.class, new MyJacksonConverter());
+		
+		injector.getInstance(TimerManager.class).init();
 	}
 
 	public static void main(final String[] args) throws Exception {

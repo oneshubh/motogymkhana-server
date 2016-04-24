@@ -13,7 +13,7 @@ import com.google.inject.Provider;
 
 import eu.motogymkhana.server.api.GymkhanaResult;
 import eu.motogymkhana.server.api.ListRidersResult;
-import eu.motogymkhana.server.api.UpdateSettingsRequest;
+import eu.motogymkhana.server.api.UploadSettingsRequest;
 import eu.motogymkhana.server.api.UpdateSettingsResponse;
 import eu.motogymkhana.server.dao.SettingsDao;
 import eu.motogymkhana.server.password.PasswordManager;
@@ -37,7 +37,7 @@ public class UpdateSettingsServerResource extends ServerResource implements Upda
 
 	@Override
 	@Post
-	public UpdateSettingsResponse updateSettings(UpdateSettingsRequest request) {
+	public UpdateSettingsResponse updateSettings(UploadSettingsRequest request) {
 		
 		UpdateSettingsResponse response = new UpdateSettingsResponse();
 

@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+import org.apache.commons.logging.Log;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -16,8 +17,9 @@ import org.apache.http.entity.StringEntity;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-import eu.motogymkhana.server.http.MyHttpClient;
+import eu.motogymkhana.server.guice.InjectLogger;
 import eu.motogymkhana.server.http.HttpResultWrapper;
+import eu.motogymkhana.server.http.MyHttpClient;
 
 @Singleton
 public class MyHttpClientImpl implements MyHttpClient {
@@ -25,15 +27,24 @@ public class MyHttpClientImpl implements MyHttpClient {
 	@Inject
 	private HttpClient client;
 
+	@InjectLogger
+	private Log log;
+
 	public MyHttpClientImpl() {
 
 	}
 
 	@Override
-	public HttpResultWrapper getStringFromUrl(String url) throws ClientProtocolException,
-			IOException {
+	public HttpResultWrapper getStringFromUrl(String url, String authString)
+			throws ClientProtocolException, IOException {
 
+		log.debug("url for download " + url);
+		
 		HttpGet httpGet = new HttpGet(url);
+		if (authString != null) {
+			httpGet.setHeader("Authorization", authString);
+		}
+
 		HttpResponse response = client.execute(httpGet);
 		HttpEntity entity = response.getEntity();
 		InputStream in = entity.getContent();

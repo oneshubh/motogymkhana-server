@@ -59,11 +59,7 @@ public class SettingsDaoImpl implements SettingsDao {
 	}
 
 	@Override
-	public void initSettings() {
-
-		store(new Settings(Country.NL, 2015, 4, 6, 105, 115));
-		store(new Settings(Country.NL, 2016, 4, 6, 105, 115));
-		store(new Settings(Country.EU, 2015, 4, 6, 105, 115));
-		store(new Settings(Country.EU, 2016, 4, 6, 105, 115));
+	public void initSettings(Country country, int season) {
+		store(new Settings(country, season, 4, 6, 105, 115));
 	}
 }

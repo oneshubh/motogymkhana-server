@@ -11,8 +11,6 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -28,6 +26,7 @@ import org.apache.commons.logging.LogFactory;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
 @Entity
 @Table(name = "riders")
@@ -56,7 +55,6 @@ public class Rider {
 	public static final String EMAIL = "email";
 
 	private static final int roundsCountingForSeasonResult = 6;
-
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -98,8 +96,8 @@ public class Rider {
 	@JsonProperty(LASTNAME)
 	@Column(name = LASTNAME)
 	private String lastName;
-	
-	@JsonProperty(EMAIL)
+
+	@JsonProperty(value = EMAIL, access = Access.WRITE_ONLY)
 	@Column(name = EMAIL)
 	private String email;
 
@@ -134,7 +132,7 @@ public class Rider {
 	@Column(name = POINTS)
 	@JsonIgnore
 	private int totalPoints;
-	
+
 	@JsonIgnore
 	@ManyToOne(cascade = CascadeType.ALL)
 	private RiderAuth riderAuth;
@@ -174,6 +172,53 @@ public class Rider {
 		riderNumber = number;
 		this.firstName = firstName;
 		this.lastName = lastName;
+	}
+
+	public Rider(RonaldRider rr, Country country, int season, int riderNumber) {
+		update(rr);
+		bib = Bib.Y;
+		this.country = country;
+		this.season = season;
+		this.riderNumber = riderNumber;
+		gender = Gender.F;
+	}
+
+	public Rider(Rider rider, Country country, int season, int riderNumber) {
+
+		firstName = rider.getFirstName();
+		lastName = rider.getLastName();
+		this.country = rider.getCountry();
+		nationality = rider.getNationality();
+		this.season = rider.getSeason();
+		gender = rider.getGender();
+		bib = rider.getBib();
+		this.season = season;
+		this.riderNumber = riderNumber;
+		email = rider.getEmail();
+		dateOfBirth = rider.getDoB();
+		bike = rider.getBike();
+		bikeImageUrl = rider.getBikeImageUrl();
+		text = rider.getText();
+	}
+
+	private String getText() {
+		return text;
+	}
+
+	private String getBikeImageUrl() {
+		return bikeImageUrl;
+	}
+
+	private String getBike() {
+		return bike;
+	}
+
+	private String getDoB() {
+		return dateOfBirth;
+	}
+
+	private String getEmail() {
+		return email;
 	}
 
 	public int getRiderNumber() {
@@ -485,10 +530,36 @@ public class Rider {
 	}
 
 	public void setCountry(Country country) {
-		this.country=country;
+		this.country = country;
 	}
 
 	public void setSeason(int season) {
 		this.season = season;
+	}
+
+	public void update(RonaldRider rr) {
+
+		firstName = rr.getFirstName();
+		lastName = rr.getLastName();
+		email = rr.getEmail();
+		setNationality(rr.getCountry());
+		imageUrl = rr.getProfilePicture().replaceAll("\\\\", "");
+	}
+
+	private void setNationality(String string) {
+
+		if (string.startsWith("Be")) {
+			nationality = Country.BE;
+		} else {
+			nationality = Country.NL;
+		}
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public String getFullName() {
+		return firstName + " " + lastName;
 	}
 }

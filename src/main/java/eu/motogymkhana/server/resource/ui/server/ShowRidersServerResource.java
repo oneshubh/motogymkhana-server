@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 
+import org.apache.commons.logging.Log;
 import org.restlet.Context;
 import org.restlet.Request;
 import org.restlet.Response;
@@ -17,23 +18,27 @@ import eu.motogymkhana.server.api.GymkhanaRequest;
 import eu.motogymkhana.server.api.ListRidersResult;
 import eu.motogymkhana.server.dao.RiderDao;
 import eu.motogymkhana.server.dao.SettingsDao;
+import eu.motogymkhana.server.guice.InjectLogger;
 import eu.motogymkhana.server.model.Country;
 import eu.motogymkhana.server.model.Rider;
 import eu.motogymkhana.server.resource.ui.ShowRidersResource;
 import eu.motogymkhana.server.settings.Settings;
 import eu.motogymkhana.server.text.TextManager;
 
-public class ShowRidersServerResource  extends ServerResource implements ShowRidersResource{
-	
+public class ShowRidersServerResource extends ServerResource implements ShowRidersResource {
+
 	@Inject
 	private RiderDao riderDao;
-	
+
+	@InjectLogger
+	private Log log;
+
 	@Inject
 	private SettingsDao settingsDao;
 
 	@Inject
 	private TextManager textManager;
-	
+
 	@Inject
 	private Provider<EntityManager> emp;
 
@@ -53,19 +58,19 @@ public class ShowRidersServerResource  extends ServerResource implements ShowRid
 		EntityManager em = emp.get();
 
 		em.getTransaction().begin();
-		
+
 		try {
-			List<Rider> riders = riderDao.getRiders(request.getCountry(),request.getSeason());
-			
+			List<Rider> riders = riderDao.getRiders(request.getCountry(), request.getSeason());
+
 			result.setRiders(riders);
-			
-			if(settingsDao.getSettings(Country.NL, 2015) == null){
-				settingsDao.initSettings();
+
+			if (settingsDao.getSettings(request.getCountry(), request.getSeason()) == null) {
+				settingsDao.initSettings(request.getCountry(), request.getSeason());
 			}
-			
+
 			Settings settings = settingsDao.getSettings(request.getCountry(), request.getSeason());
 			result.setSettings(settings);
-			
+
 			result.setResult(ListRidersResult.OK);
 
 			em.getTransaction().commit();

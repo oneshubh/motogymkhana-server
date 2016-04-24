@@ -10,5 +10,5 @@ public interface SettingsDao {
 
 	Settings getSettings(Country country, int season);
 
-	void initSettings();
+	void initSettings(Country country, int season);
 }

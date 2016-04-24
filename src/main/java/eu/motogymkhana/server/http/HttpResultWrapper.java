@@ -36,4 +36,8 @@ public class HttpResultWrapper {
 	public void setErrorMessage(String errorMessage) {
 		this.errorMessage = errorMessage;
 	}
+
+	public boolean isOK() {
+		return statusCode == 200;
+	}
 }

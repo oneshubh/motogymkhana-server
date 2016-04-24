@@ -27,7 +27,7 @@ public class TimesDaoImpl implements TimesDao {
 	public int update(Times times) {
 
 		EntityManager em = emp.get();
-		
+
 		try {
 
 			TypedQuery<Times> query = em
@@ -42,23 +42,21 @@ public class TimesDaoImpl implements TimesDao {
 				existingTimes = query.setParameter("country", times.getCountry())
 						.setParameter("season", times.getSeason())
 						.setParameter("date", times.getDate())
-						.setParameter("number", times.getRiderNumber())
-						.getSingleResult();
+						.setParameter("number", times.getRiderNumber()).getSingleResult();
 
 			} catch (NoResultException nre) {
 			}
 
 			if (existingTimes == null) {
 
-				Rider rider = riderDao.getRiderForNumber(times.getCountry(), times.getSeason(), times.getRiderNumber());
-				times.setRider(rider);				
+				Rider rider = riderDao.getRiderForNumber(times.getCountry(), times.getSeason(),
+						times.getRiderNumber());
+				times.setRider(rider);
 				em.persist(times);
+				rider.addTimes(times);
 
 			} else {
-
-				times.setRider(existingTimes.getRider());
-				times.set_id(existingTimes.get_id());
-				em.merge(times);
+				existingTimes.merge(times);
 			}
 
 		} catch (Exception e) {

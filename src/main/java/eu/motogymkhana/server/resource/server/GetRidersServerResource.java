@@ -4,10 +4,10 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 
+import org.apache.commons.logging.Log;
 import org.restlet.Context;
 import org.restlet.Request;
 import org.restlet.Response;
-import org.restlet.resource.Get;
 import org.restlet.resource.Post;
 import org.restlet.resource.ServerResource;
 
@@ -18,6 +18,7 @@ import eu.motogymkhana.server.api.GymkhanaRequest;
 import eu.motogymkhana.server.api.ListRidersResult;
 import eu.motogymkhana.server.dao.RiderDao;
 import eu.motogymkhana.server.dao.SettingsDao;
+import eu.motogymkhana.server.guice.InjectLogger;
 import eu.motogymkhana.server.model.Rider;
 import eu.motogymkhana.server.resource.GetRidersResource;
 import eu.motogymkhana.server.settings.Settings;
@@ -27,12 +28,15 @@ public class GetRidersServerResource extends ServerResource implements GetRiders
 
 	@Inject
 	private RiderDao riderDao;
-	
+
 	@Inject
 	private SettingsDao settingsDao;
 
 	@Inject
 	private TextManager textManager;
+
+	@InjectLogger
+	private Log log;
 
 	@Inject
 	private Provider<EntityManager> emp;
@@ -59,13 +63,13 @@ public class GetRidersServerResource extends ServerResource implements GetRiders
 		em.getTransaction().begin();
 
 		try {
-			
+
 			List<Rider> riders = riderDao.getRiders(request.getCountry(), request.getSeason());
 			result.setRiders(riders);
-			
+
 			Settings settings = settingsDao.getSettings(request.getCountry(), request.getSeason());
 			result.setSettings(settings);
-			
+
 			result.setResult(ListRidersResult.OK);
 
 			em.getTransaction().commit();

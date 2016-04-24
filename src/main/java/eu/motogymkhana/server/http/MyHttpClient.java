@@ -7,7 +7,7 @@ import org.apache.http.client.ClientProtocolException;
 
 public interface MyHttpClient {
 
-	public HttpResultWrapper getStringFromUrl(String url) throws ClientProtocolException,
+	public HttpResultWrapper getStringFromUrl(String url, String authString) throws ClientProtocolException,
 			IOException;
 
 	public HttpResultWrapper postStringFromUrl(String url, String input)

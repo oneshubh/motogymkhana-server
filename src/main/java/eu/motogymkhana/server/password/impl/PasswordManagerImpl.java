@@ -25,6 +25,7 @@ public class PasswordManagerImpl implements PasswordManager {
 	private RiderAuthDao riderAuthDao;
 
 	private String nlPasswordHash = "aVPXVxwCy9tyU+RqbtLLsjwbtE40z9ZTDEvbubQ8I/c=";
+	private String uaPasswordHash = "r/OZGL5gdtMwFKkncxOhXN5/7qhZLp3xO1RoDZfzsUk=";
 
 	@Override
 	public boolean checkPassword(Country country, String password) {

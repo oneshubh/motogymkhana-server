@@ -23,9 +23,6 @@ import eu.motogymkhana.server.resource.UpdateRiderResource;
 import eu.motogymkhana.server.resource.UpdateTimesResource;
 
 public class UpdateTimesServerResource extends ServerResource implements UpdateTimesResource {
-
-	@Inject
-	private RiderDao riderDao;
 	
 	@Inject
 	private TimesDao timesDao;
