@@ -72,10 +72,10 @@ public class GymkhanaServer extends Application {
 
 		params.add("sslContextFactory", "org.restlet.engine.ssl.DefaultSslContextFactory");
 		params.add("keystorePath", "/home/christine/motogymkhana/pengo_ssl.jks");
-		params.add("keystorePassword", ServerConstants.keyStorePw);
+		params.add("keystorePassword", GymkhanaProperties.getProperty("keystore_password"));
 		params.add("keystoreType", ServerConstants.keyStoreType);
 		params.add("keyAlias", ServerConstants.keyAlias);
-		params.add("keyPassword", ServerConstants.keyPw);
+		params.add("keyPassword", GymkhanaProperties.getProperty("key_password"));
 
 		final Router router = new Router(mainComponent.getContext().createChildContext());
 

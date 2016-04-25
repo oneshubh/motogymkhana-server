@@ -14,8 +14,8 @@
 			<property name="hibernate.format_sql" value="true" />
 			<property name="hibernate.connection.driver_class" value="org.postgresql.Driver" />
 			<property name="hibernate.connection.url" value="jdbc:postgresql://localhost/gymkhana" />
-			<property name="hibernate.connection.username" value="gymkhana" />
-			<property name="hibernate.connection.password" value="gymkhana" />
+			<property name="hibernate.connection.username" value="gymkhana.user" />
+			<property name="hibernate.connection.password" value="gymkhana.pw" />
 			<property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect" />
 			<property name="hibernate.hbm2ddl.auto" value="update" />
 		</properties>
@@ -33,8 +33,8 @@
 			<property name="hibernate.format_sql" value="true" />
 			<property name="hibernate.connection.driver_class" value="org.postgresql.Driver" />
 			<property name="hibernate.connection.url" value="jdbc:postgresql://localhost/gymkhana_test" />
-			<property name="hibernate.connection.username" value="christine" />
-			<property name="hibernate.connection.password" value="smndbvr" />
+			<property name="hibernate.connection.username" value="gymkhana.user" />
+			<property name="hibernate.connection.password" value="gymkhana.pw" />
 			<property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect" />
 			<property name="hibernate.hbm2ddl.auto" value="update" />
 		</properties>
