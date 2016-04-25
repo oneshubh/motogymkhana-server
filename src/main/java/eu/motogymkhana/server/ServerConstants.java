@@ -7,9 +7,9 @@ public class ServerConstants {
 	public static final int HTTPS_PORT = 9005;
 	public static final int HTTP_PORT = 8085;
 
-	public static String keyStorePw = "43dfkl;349";
+	public static String keyStorePw = "gymkhana";
 	public static String keyStoreType = "JKS";
-	public static String keyPw = "43dfkl;349";
+	public static String keyPw = "gymkhana";
 	public static String keyAlias = "pengo_ssl";
 	// public static final String testKeyAlias = "gossiptest";
 
