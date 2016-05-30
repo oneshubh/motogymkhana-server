@@ -116,4 +116,14 @@ public class Round {
 	public int getSeason() {
 		return season;
 	}
+
+	@Override
+	public boolean equals(Object otherRound) {
+		return otherRound instanceof Round && ((Round) otherRound).getDate() == date;
+	}
+	
+	@Override
+	public int hashCode(){
+		return date.intValue();
+	}
 }

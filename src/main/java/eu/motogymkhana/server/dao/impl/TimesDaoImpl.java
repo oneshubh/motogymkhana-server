@@ -1,5 +1,8 @@
 package eu.motogymkhana.server.dao.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
@@ -9,6 +12,7 @@ import com.google.inject.Provider;
 
 import eu.motogymkhana.server.dao.RiderDao;
 import eu.motogymkhana.server.dao.TimesDao;
+import eu.motogymkhana.server.model.Country;
 import eu.motogymkhana.server.model.Rider;
 import eu.motogymkhana.server.model.Times;
 
@@ -65,5 +69,29 @@ public class TimesDaoImpl implements TimesDao {
 		}
 
 		return 0;
+	}
+
+	@Override
+	public List<Times> getTimes(Country country, int season, long date) {
+
+		EntityManager em = emp.get();
+		
+		List<Times> result = new ArrayList<Times>();
+
+		TypedQuery<Times> query = em
+				.createQuery(
+						"select a from "
+								+ Times.class.getSimpleName()
+								+ " a where a.country = :country and a.season = :season and a.date = :date",
+						Times.class);
+
+		try {
+			result = query.setParameter("country", country).setParameter("season", season)
+					.setParameter("date", date).getResultList();
+
+		} catch (NoResultException nre) {
+		}
+
+		return result;
 	}
 }

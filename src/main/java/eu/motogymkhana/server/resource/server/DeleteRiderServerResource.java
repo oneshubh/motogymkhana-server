@@ -2,6 +2,7 @@ package eu.motogymkhana.server.resource.server;
 
 import javax.persistence.EntityManager;
 
+import org.apache.commons.logging.Log;
 import org.restlet.Context;
 import org.restlet.Request;
 import org.restlet.Response;
@@ -15,6 +16,7 @@ import com.google.inject.Provider;
 import eu.motogymkhana.server.api.UpdateRiderRequest;
 import eu.motogymkhana.server.api.UpdateRiderResponse;
 import eu.motogymkhana.server.dao.RiderDao;
+import eu.motogymkhana.server.guice.InjectLogger;
 import eu.motogymkhana.server.model.Rider;
 import eu.motogymkhana.server.password.PasswordManager;
 import eu.motogymkhana.server.resource.DeleteRiderResource;
@@ -30,6 +32,9 @@ public class DeleteRiderServerResource extends ServerResource implements DeleteR
 
 	@Inject
 	private Provider<EntityManager> emp;
+	
+	@InjectLogger
+	private Log log;
 
 	@Override
 	public void init(Context context, Request request, Response response) {
@@ -54,6 +59,7 @@ public class DeleteRiderServerResource extends ServerResource implements DeleteR
 		try {
 
 			int result = riderDao.deleteRider(request.getRider());
+			log.debug("delete rider result " + result);
 
 			response.setStatus(result);
 

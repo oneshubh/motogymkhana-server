@@ -23,8 +23,8 @@ import com.google.inject.persist.jpa.JpaPersistModule;
 
 import eu.motogymkhana.server.guice.GymkhanaModule;
 import eu.motogymkhana.server.jackson.MyJacksonConverter;
-import eu.motogymkhana.server.password.PasswordManager;
 import eu.motogymkhana.server.persist.PersistenceInitializer;
+import eu.motogymkhana.server.properties.GymkhanaProperties;
 import eu.motogymkhana.server.resource.server.CheckPasswordServerResource;
 import eu.motogymkhana.server.resource.server.DeleteRiderServerResource;
 import eu.motogymkhana.server.resource.server.GetRidersServerResource;
@@ -61,20 +61,24 @@ public class GymkhanaServer extends Application {
 
 		FinderFactory ff = injector.getInstance(FinderFactory.class);
 
+		GymkhanaProperties.init();
+
 		/*
 		 * main gymkhana server
 		 */
 		final Component mainComponent = new Component();
-		Server server = mainComponent.getServers().add(Protocol.HTTPS, ServerConstants.HTTPS_PORT);
-		mainComponent.getServers().add(Protocol.HTTP, ServerConstants.HTTP_PORT);
+		Server server = mainComponent.getServers().add(Protocol.HTTPS,
+				GymkhanaProperties.getIntProperty("https_port"));
+		mainComponent.getServers().add(Protocol.HTTP,
+				GymkhanaProperties.getIntProperty("http_port"));
 
 		Series<Parameter> params = server.getContext().getParameters();
 
 		params.add("sslContextFactory", "org.restlet.engine.ssl.DefaultSslContextFactory");
-		params.add("keystorePath", "/home/christine/motogymkhana/pengo_ssl.jks");
+		params.add("keystorePath", GymkhanaProperties.getProperty("keystore_path"));
 		params.add("keystorePassword", GymkhanaProperties.getProperty("keystore_password"));
-		params.add("keystoreType", ServerConstants.keyStoreType);
-		params.add("keyAlias", ServerConstants.keyAlias);
+		params.add("keystoreType", GymkhanaProperties.getProperty("keystore_type"));
+		params.add("keyAlias", GymkhanaProperties.getProperty("key_alias"));
 		params.add("keyPassword", GymkhanaProperties.getProperty("key_password"));
 
 		final Router router = new Router(mainComponent.getContext().createChildContext());
@@ -104,7 +108,7 @@ public class GymkhanaServer extends Application {
 		mainComponent.start();
 
 		replaceConverter(JacksonConverter.class, new MyJacksonConverter());
-		
+
 		injector.getInstance(TimerManager.class).init();
 	}
 

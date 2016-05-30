@@ -14,9 +14,11 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 
 import eu.motogymkhana.server.dao.RoundDao;
+import eu.motogymkhana.server.dao.TimesDao;
 import eu.motogymkhana.server.guice.InjectLogger;
 import eu.motogymkhana.server.model.Country;
 import eu.motogymkhana.server.model.Round;
+import eu.motogymkhana.server.model.Times;
 
 public class RoundDaoImpl implements RoundDao {
 
@@ -24,27 +26,55 @@ public class RoundDaoImpl implements RoundDao {
 	private Log log;
 
 	private Provider<EntityManager> emp;
+	private TimesDao timesDao;
 
 	@Inject
-	public RoundDaoImpl(Provider<EntityManager> emp) {
+	public RoundDaoImpl(Provider<EntityManager> emp, TimesDao timesDao) {
 		this.emp = emp;
+		this.timesDao = timesDao;
 	}
 
 	@Override
 	public int storeRounds(Collection<Round> rounds) {
 
-		Iterator<Round> iterator = rounds.iterator();
+		if (rounds != null && rounds.size() > 0) {
+			Round r = rounds.iterator().next();
+			final Collection<Round> existingRounds = getRounds(r.getCountry(), r.getSeason());
 
-		try {
+			Iterator<Round> iterator = rounds.iterator();
 
-			while (iterator.hasNext()) {
-				store(iterator.next());
+			try {
+
+				while (iterator.hasNext()) {
+					Round round = iterator.next();
+					store(round);
+					if (existingRounds.contains(round)) {
+						existingRounds.remove(round);
+					}
+				}
+			} catch (Exception e) {
+				return -1;
 			}
-		} catch (Exception e) {
-			return -1;
+
+			EntityManager em = emp.get();
+
+			for (Round roundToDelete : existingRounds) {
+				removeTimes(roundToDelete.getCountry(), roundToDelete.getSeason(), roundToDelete.getDate());
+				em.remove(roundToDelete);
+			}
 		}
 
 		return 0;
+	}
+
+	private void removeTimes(Country country, int season, long date) {
+		List<Times> list = timesDao.getTimes(country, season, date);
+		if (list != null) {
+			EntityManager em = emp.get();
+			for (Times t : list) {
+				em.remove(t);
+			}
+		}
 	}
 
 	@Override

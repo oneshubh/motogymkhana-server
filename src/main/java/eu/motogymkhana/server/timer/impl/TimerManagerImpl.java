@@ -77,8 +77,10 @@ public class TimerManagerImpl implements TimerManager {
 	public void init() {
 
 		ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-		scheduler.scheduleAtFixedRate(downloadRidersTask, ServerConstants.RONALD_DOWNLOAD_START,
-				ServerConstants.RONALD_DOWNLOAD_INTERVAL, ServerConstants.RONALD_DOWNLOAD_TIMEUNIT);
+		scheduler.scheduleAtFixedRate(downloadRidersTask,
+				GymkhanaProperties.getIntProperty("ronald_download_start"),
+				GymkhanaProperties.getIntProperty("ronald_download_interval"),
+				ServerConstants.RONALD_DOWNLOAD_TIMEUNIT);
 	}
 
 	protected void loadFromRonaldsServerInThread(final Country country) {
