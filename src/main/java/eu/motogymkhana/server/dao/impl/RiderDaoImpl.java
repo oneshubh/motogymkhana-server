@@ -42,6 +42,7 @@ public class RiderDaoImpl implements RiderDao {
 	public int updateRider(Rider rider) {
 
 		EntityManager em = emp.get();
+		Rider existingRider = null;
 
 		try {
 
@@ -51,7 +52,6 @@ public class RiderDaoImpl implements RiderDao {
 									+ Rider.class.getSimpleName()
 									+ " a where a.riderNumber = :number and a.country = :country and a.season = :season",
 							Rider.class);
-			Rider existingRider = null;
 
 			try {
 				existingRider = query.setParameter("country", rider.getCountry())
@@ -155,6 +155,25 @@ public class RiderDaoImpl implements RiderDao {
 	}
 
 	@Override
+	public Rider getRiderByEmail(Country country, int season, String email) {
+
+		EntityManager em = emp.get();
+		Rider existingRider = null;
+
+		TypedQuery<Rider> query = em.createQuery("select a from " + Rider.class.getSimpleName()
+				+ " a where a.email = :email and a.country = :country and a.season = :season",
+				Rider.class);
+
+		try {
+			existingRider = query.setParameter("email", email).setParameter("country", country)
+					.setParameter("season", season).getSingleResult();
+		} catch (NoResultException nre) {
+		}
+
+		return existingRider;
+	}
+
+	@Override
 	public List<Rider> getRiders(Country country, int year) {
 
 		EntityManager em = emp.get();
@@ -205,12 +224,12 @@ public class RiderDaoImpl implements RiderDao {
 					.getFullName());
 
 			if (existingRider != null) {
-				if(existingRider.hasTimes()){
-					for(Times times : existingRider.getTimes()){
+				if (existingRider.hasTimes()) {
+					for (Times times : existingRider.getTimes()) {
 						em.remove(times);
 					}
 				}
-				
+
 				em.remove(existingRider);
 				log.debug("remove " + existingRider.getFullName());
 			}

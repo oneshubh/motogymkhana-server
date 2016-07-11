@@ -5,34 +5,29 @@
  * http://www. apache.org/licenses/LICENSE-2.0.
  *  
  *******************************************************************************/
-package eu.motogymkhana.server.resource.server;
-
-import java.util.Collection;
+package eu.motogymkhana.server.resource.ui.server;
 
 import javax.persistence.EntityManager;
 
 import org.restlet.Context;
 import org.restlet.Request;
 import org.restlet.Response;
-import org.restlet.resource.Get;
 import org.restlet.resource.Post;
 import org.restlet.resource.ServerResource;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
-import eu.motogymkhana.server.api.request.GymkhanaRequest;
-import eu.motogymkhana.server.api.result.ListRidersResult;
-import eu.motogymkhana.server.api.result.ListRoundsResult;
-import eu.motogymkhana.server.model.Round;
-import eu.motogymkhana.server.resource.GetRoundsResource;
-import eu.motogymkhana.server.resource.ui.ShowRidersResource;
-import eu.motogymkhana.server.round.RoundManager;
+import eu.motogymkhana.server.api.request.SigninRiderRequest;
+import eu.motogymkhana.server.api.result.RegisterRiderResult;
+import eu.motogymkhana.server.api.result.SigninRiderResult;
+import eu.motogymkhana.server.password.PasswordManager;
+import eu.motogymkhana.server.resource.ui.SigninRiderResource;
 
-public class GetRoundsServerResource extends ServerResource implements GetRoundsResource {
+public class SigninRiderServerResource extends ServerResource implements SigninRiderResource {
 
 	@Inject
-	private RoundManager roundManager;
+	private PasswordManager passwordManager;
 
 	@Inject
 	private Provider<EntityManager> emp;
@@ -44,25 +39,21 @@ public class GetRoundsServerResource extends ServerResource implements GetRounds
 
 	@Override
 	@Post
-	public ListRoundsResult getRounds(GymkhanaRequest request) {
+	public SigninRiderResult signin(SigninRiderRequest request) {
 
-		ListRoundsResult result = new ListRoundsResult();
+		SigninRiderResult result = new SigninRiderResult();
 		result.setResultCode(-1);
-		
-		if(request == null){
-			return result;
-		}
+		boolean check = false;
 
 		EntityManager em = emp.get();
 
 		em.getTransaction().begin();
 
 		try {
-			Collection<Round> rounds = roundManager.getRounds(request.getCountry(),
-					request.getSeason());
 
-			result.setRounds(rounds);
-			result.setResultCode(ListRidersResult.OK);
+			check = passwordManager.checkRiderPassword(request.getEmail(), request.getPassword());
+
+			result.setResultCode(check ? RegisterRiderResult.OK : RegisterRiderResult.NOT_OK);
 
 			em.getTransaction().commit();
 
@@ -70,7 +61,7 @@ public class GetRoundsServerResource extends ServerResource implements GetRounds
 			e.printStackTrace();
 			em.getTransaction().rollback();
 		}
+
 		return result;
 	}
-
 }

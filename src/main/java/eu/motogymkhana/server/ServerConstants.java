@@ -29,8 +29,11 @@ public class ServerConstants {
 	public static final String UI_GET_RIDERS = "/ui/getRiders/";
 	public static final String UI_GET_ROUNDS = "/ui/getRounds/";
 	public static final String UI_GET_SETTINGS = "/ui/getSettings/";
-	public static final String UI_SEND_RIDER_TOKEN = "/ui/sendToken/";
+	public static final String UI_SEND_TOKEN = "/ui/sendToken/";
 	public static final String UI_REGISTER_RIDER = "/ui/registerRider/";
+	public static final String UI_SIGNIN_RIDER = "/ui/signinRider/";
+	public static final String UI_GET_RIDER = "/ui/getRider/";
+	public static final String UI_UPDATE_RIDER = "/ui/updateRider/";
 
 	public static final String MOTOGYMKHANA = "/motogymkhana";
 

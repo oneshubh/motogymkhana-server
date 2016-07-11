@@ -8,6 +8,7 @@
 package eu.motogymkhana.server.dao;
 
 import eu.motogymkhana.server.model.Country;
+import eu.motogymkhana.server.model.Password;
 
 public interface PasswordDao {
 

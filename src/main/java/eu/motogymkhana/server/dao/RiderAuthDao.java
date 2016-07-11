@@ -15,4 +15,7 @@ public interface RiderAuthDao {
 
 	boolean checkPasswordHash(String email, String createHash);
 
+	void create(RiderAuth riderAuth);
+
+	void delete(String email);
 }

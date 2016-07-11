@@ -5,26 +5,29 @@
  * http://www. apache.org/licenses/LICENSE-2.0.
  *  
  *******************************************************************************/
-package eu.motogymkhana.server.api;
+package eu.motogymkhana.server.api.request;
+
+import java.util.List;
 
 import eu.motogymkhana.server.model.Rider;
 
-/**
- * Created by christine on 15-5-15.
- */
-public class UpdateRiderRequest extends GymkhanaRequest {
+public class UploadRidersRequest extends GymkhanaRequest {
 
-	private Rider rider;
+	private List<Rider> riders;
 
-	public UpdateRiderRequest(){
-		
-	}
-	
-	public UpdateRiderRequest(Rider rider) {
-		this.rider = rider;
+	public UploadRidersRequest() {
 	}
 
-	public Rider getRider() {
-		return rider;
+	public UploadRidersRequest(List<Rider> riders) {
+		this.riders = riders;
 	}
+
+	public List<Rider> getRiders() {
+		return riders;
+	}
+
+	public void setRiders(List<Rider> riders) {
+		this.riders = riders;
+	}
+
 }

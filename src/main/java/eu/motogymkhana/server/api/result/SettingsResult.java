@@ -5,7 +5,7 @@
  * http://www. apache.org/licenses/LICENSE-2.0.
  *  
  *******************************************************************************/
-package eu.motogymkhana.server.api;
+package eu.motogymkhana.server.api.result;
 
 import eu.motogymkhana.server.settings.Settings;
 

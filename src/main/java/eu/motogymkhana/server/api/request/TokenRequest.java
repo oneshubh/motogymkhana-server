@@ -5,18 +5,18 @@
  * http://www. apache.org/licenses/LICENSE-2.0.
  *  
  *******************************************************************************/
-package eu.motogymkhana.server.api;
+package eu.motogymkhana.server.api.request;
 
-public class UpdateSettingsResponse {
+public class TokenRequest extends GymkhanaRequest{
 
-	private int status;
+	private String email;
+	private String token;
 
-	public int getStatus() {
-		return status;
+	public String getEmail() {
+		return email;
 	}
 
-	public void setStatus(int status) {
-		this.status = status;
+	public String getToken() {
+		return token;
 	}
-	
 }

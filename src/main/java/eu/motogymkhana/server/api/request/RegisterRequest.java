@@ -5,24 +5,8 @@
  * http://www. apache.org/licenses/LICENSE-2.0.
  *  
  *******************************************************************************/
-package eu.motogymkhana.server.api;
+package eu.motogymkhana.server.api.request;
 
-public class UploadRidersResponse {
+public class RegisterRequest extends GymkhanaRequest{
 
-	private int status;
-	private int numberOfRiders;
-	
-	public int getStatus() {
-		return status;
-	}
-	public void setStatus(int status) {
-		this.status = status;
-	}
-	public int getNumberOfRiders() {
-		return numberOfRiders;
-	}
-	public void setNumberOfRiders(int numberOfRiders) {
-		this.numberOfRiders = numberOfRiders;
-	}
-	
 }

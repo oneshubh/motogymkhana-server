@@ -18,8 +18,8 @@ import org.restlet.resource.ServerResource;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
-import eu.motogymkhana.server.api.UploadRidersRequest;
-import eu.motogymkhana.server.api.UploadRidersResponse;
+import eu.motogymkhana.server.api.request.UploadRidersRequest;
+import eu.motogymkhana.server.api.response.UploadRidersResponse;
 import eu.motogymkhana.server.dao.RiderDao;
 import eu.motogymkhana.server.password.PasswordManager;
 import eu.motogymkhana.server.resource.UpdateRidersResource;

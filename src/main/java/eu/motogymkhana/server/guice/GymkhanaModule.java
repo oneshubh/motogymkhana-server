@@ -81,8 +81,6 @@ public class GymkhanaModule extends AbstractModule {
 		// inject logger
 		// (http://code.google.com/p/google-guice/wiki/CustomInjections)
 		bindListener(Matchers.any(), new LogTypeListener());
-
-
 	}
 
 	static Matcher<TypeLiteral<?>> type(final Matcher<? super Class> matcher) {

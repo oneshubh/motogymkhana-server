@@ -47,22 +47,32 @@ public class RiderAuth {
 
 	@Column(name = COUNTRY)
 	private Country country;
-	
+
 	@Column(name = TOKEN)
 	private String token;
-	
+
 	@Column(name = TIMESTAMP)
 	private long timeStamp;
-	
+
 	@JsonProperty(RIDER)
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
 	private Set<Rider> riders = new HashSet<Rider>();
 
+	public RiderAuth() {
+		timeStamp = System.currentTimeMillis();
+	}
+
+	public RiderAuth(String email, String token) {
+		this.email = email;
+		this.token = token;
+		timeStamp = System.currentTimeMillis();
+	}
+
 	public String getToken() {
 		return token;
 	}
-	
-	public void setToken(String token){
+
+	public void setToken(String token) {
 		this.token = token;
 		timeStamp = System.currentTimeMillis();
 	}
@@ -81,5 +91,13 @@ public class RiderAuth {
 
 	public long getTimeStamp() {
 		return timeStamp;
+	}
+
+	public boolean hasToken() {
+		return token != null;
+	}
+
+	public boolean hasPassword() {
+		return passwordHash !=null;
 	}
 }

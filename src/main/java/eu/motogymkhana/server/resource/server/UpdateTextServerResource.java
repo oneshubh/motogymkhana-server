@@ -15,7 +15,7 @@ import org.restlet.resource.ServerResource;
 
 import com.google.inject.Inject;
 
-import eu.motogymkhana.server.api.UpdateTextRequest;
+import eu.motogymkhana.server.api.request.UpdateTextRequest;
 import eu.motogymkhana.server.password.PasswordManager;
 import eu.motogymkhana.server.resource.UpdateTextResource;
 import eu.motogymkhana.server.text.TextManager;

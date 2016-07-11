@@ -8,6 +8,7 @@
 package eu.motogymkhana.server.resource.server;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 
 import org.apache.commons.logging.Log;
 import org.restlet.Context;
@@ -20,8 +21,9 @@ import org.restlet.resource.ServerResource;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
-import eu.motogymkhana.server.api.UpdateRiderRequest;
-import eu.motogymkhana.server.api.UpdateRiderResponse;
+import eu.motogymkhana.server.api.request.UpdateRiderRequest;
+import eu.motogymkhana.server.api.response.UpdateRiderResponse;
+import eu.motogymkhana.server.dao.RiderAuthDao;
 import eu.motogymkhana.server.dao.RiderDao;
 import eu.motogymkhana.server.guice.InjectLogger;
 import eu.motogymkhana.server.model.Rider;
@@ -33,13 +35,16 @@ public class DeleteRiderServerResource extends ServerResource implements DeleteR
 
 	@Inject
 	private RiderDao riderDao;
-	
+
+	@Inject
+	private RiderAuthDao riderAuthDao;
+
 	@Inject
 	private PasswordManager pwManager;
 
 	@Inject
 	private Provider<EntityManager> emp;
-	
+
 	@InjectLogger
 	private Log log;
 
@@ -53,20 +58,39 @@ public class DeleteRiderServerResource extends ServerResource implements DeleteR
 	public UpdateRiderResponse deleteRider(UpdateRiderRequest request) {
 
 		UpdateRiderResponse response = new UpdateRiderResponse();
-		
-		if(!pwManager.checkPassword(request.getCountry(), request.getPassword())){	
+
+		if (request.getRider() == null) {
+			response.setStatus(-1);
+			return response;
+		}
+
+		if (!pwManager.checkPassword(request.getCountry(), request.getPassword())) {
 			response.setStatus(404);
 			return response;
 		}
 
 		EntityManager em = emp.get();
+		int result = -1;
 
 		em.getTransaction().begin();
 
 		try {
 
-			int result = riderDao.deleteRider(request.getRider());
-			log.debug("delete rider result " + result);
+			Rider existingRider = riderDao.getRiderForNumber(request.getCountry(),
+					request.getSeason(), request.getRider().getRiderNumber());
+
+			if (existingRider != null) {
+				if (existingRider.hasEmail()) {
+					try {
+						riderAuthDao.delete(existingRider.getEmail());
+					} catch (NoResultException nre) {
+						log.info("rider " + existingRider.getEmail() + " did not have auth object");
+					}
+				}
+
+				result = riderDao.deleteRider(existingRider);
+				log.debug("delete rider result " + result);
+			}
 
 			response.setStatus(result);
 

@@ -7,13 +7,16 @@
  *******************************************************************************/
 package eu.motogymkhana.server.password;
 
+import eu.motogymkhana.server.api.request.TokenRequest;
 import eu.motogymkhana.server.model.Country;
 
 public interface PasswordManager {
 
-	public boolean checkPassword(Country country, String password);
+	boolean checkPassword(Country country, String password);
 
-	public String createHash(String password);
+	String createHash(String password);
 
 	boolean checkRiderPassword(String email, String password);
+
+	int createRiderAccount(TokenRequest request);
 }

@@ -19,9 +19,9 @@ import org.restlet.resource.ServerResource;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
-import eu.motogymkhana.server.api.UpdateRiderRequest;
-import eu.motogymkhana.server.api.UpdateRiderResponse;
-import eu.motogymkhana.server.api.UpdateTimesRequest;
+import eu.motogymkhana.server.api.request.UpdateRiderRequest;
+import eu.motogymkhana.server.api.request.UpdateTimesRequest;
+import eu.motogymkhana.server.api.response.UpdateRiderResponse;
 import eu.motogymkhana.server.dao.RiderDao;
 import eu.motogymkhana.server.dao.TimesDao;
 import eu.motogymkhana.server.model.Rider;
@@ -52,7 +52,7 @@ public class UpdateTimesServerResource extends ServerResource implements UpdateT
 		UpdateRiderResponse response = new UpdateRiderResponse();
 		
 		if(!pwManager.checkPassword(request.getCountry(), request.getPassword())){	
-			response.setStatus(404);
+			response.setStatus(401);
 			return response;
 		}
 

@@ -46,7 +46,12 @@ import eu.motogymkhana.server.resource.server.UploadRidersServerResource;
 import eu.motogymkhana.server.resource.server.UploadRoundsServerResource;
 import eu.motogymkhana.server.resource.ui.RegisterRiderResource;
 import eu.motogymkhana.server.resource.ui.SendRiderTokenResource;
+import eu.motogymkhana.server.resource.ui.server.RegisterRiderServerResource;
+import eu.motogymkhana.server.resource.ui.server.SendRiderTokenServerResource;
 import eu.motogymkhana.server.resource.ui.server.ShowRidersServerResource;
+import eu.motogymkhana.server.resource.ui.server.SigninRiderServerResource;
+import eu.motogymkhana.server.resource.ui.server.UIGetRiderServerResource;
+import eu.motogymkhana.server.resource.ui.server.UIUpdateRiderServerResource;
 import eu.motogymkhana.server.timer.TimerManager;
 
 public class GymkhanaServer extends Application {
@@ -108,8 +113,11 @@ public class GymkhanaServer extends Application {
 		router.attach(ServerConstants.UI_GET_RIDERS, ff.finder(ShowRidersServerResource.class));
 		router.attach(ServerConstants.UI_GET_ROUNDS, ff.finder(GetRoundsServerResource.class));
 		router.attach(ServerConstants.UI_GET_SETTINGS, ff.finder(GetSettingsServerResource.class));
-		router.attach(ServerConstants.UI_SEND_RIDER_TOKEN, ff.finder(SendRiderTokenResource.class));
-		router.attach(ServerConstants.UI_REGISTER_RIDER, ff.finder(RegisterRiderResource.class));
+		router.attach(ServerConstants.UI_SEND_TOKEN, ff.finder(SendRiderTokenServerResource.class));
+		router.attach(ServerConstants.UI_REGISTER_RIDER, ff.finder(RegisterRiderServerResource.class));
+		router.attach(ServerConstants.UI_SIGNIN_RIDER, ff.finder(SigninRiderServerResource.class));
+		router.attach(ServerConstants.UI_GET_RIDER, ff.finder(UIGetRiderServerResource.class));
+		router.attach(ServerConstants.UI_UPDATE_RIDER, ff.finder(UIUpdateRiderServerResource.class));
 
 		mainComponent.getDefaultHost().attach(ServerConstants.MOTOGYMKHANA, router);
 		mainComponent.start();

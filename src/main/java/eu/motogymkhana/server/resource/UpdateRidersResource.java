@@ -7,8 +7,8 @@
  *******************************************************************************/
 package eu.motogymkhana.server.resource;
 
-import eu.motogymkhana.server.api.UploadRidersRequest;
-import eu.motogymkhana.server.api.UploadRidersResponse;
+import eu.motogymkhana.server.api.request.UploadRidersRequest;
+import eu.motogymkhana.server.api.response.UploadRidersResponse;
 
 public interface UpdateRidersResource {
 

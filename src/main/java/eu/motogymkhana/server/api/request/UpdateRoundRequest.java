@@ -5,29 +5,25 @@
  * http://www. apache.org/licenses/LICENSE-2.0.
  *  
  *******************************************************************************/
-package eu.motogymkhana.server.api;
+package eu.motogymkhana.server.api.request;
 
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-import eu.motogymkhana.server.model.Rider;
+import eu.motogymkhana.server.model.Round;
 
-public class UploadRidersRequest extends GymkhanaRequest {
+/**
+ * Created by christine on 15-5-15.
+ */
+public class UpdateRoundRequest extends GymkhanaRequest {
 
-	private List<Rider> riders;
+	@JsonProperty("round")
+	private Round round;
 
-	public UploadRidersRequest() {
+	public UpdateRoundRequest(Round round) {
+		this.round = round;
 	}
 
-	public UploadRidersRequest(List<Rider> riders) {
-		this.riders = riders;
+	public Round getRound() {
+		return round;
 	}
-
-	public List<Rider> getRiders() {
-		return riders;
-	}
-
-	public void setRiders(List<Rider> riders) {
-		this.riders = riders;
-	}
-
 }

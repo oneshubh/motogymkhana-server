@@ -7,8 +7,8 @@
  *******************************************************************************/
 package eu.motogymkhana.server.resource;
 
-import eu.motogymkhana.server.api.UploadSettingsRequest;
-import eu.motogymkhana.server.api.UpdateSettingsResponse;
+import eu.motogymkhana.server.api.request.UploadSettingsRequest;
+import eu.motogymkhana.server.api.response.UpdateSettingsResponse;
 
 public interface UpdateSettingsResource {
 

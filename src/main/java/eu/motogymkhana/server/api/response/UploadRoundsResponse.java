@@ -5,25 +5,18 @@
  * http://www. apache.org/licenses/LICENSE-2.0.
  *  
  *******************************************************************************/
-package eu.motogymkhana.server.api;
+package eu.motogymkhana.server.api.response;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+public class UploadRoundsResponse {
 
-import eu.motogymkhana.server.model.Round;
+	private int status;
 
-/**
- * Created by christine on 15-5-15.
- */
-public class UpdateRoundRequest extends GymkhanaRequest {
-
-	@JsonProperty("round")
-	private Round round;
-
-	public UpdateRoundRequest(Round round) {
-		this.round = round;
+	public int getStatus() {
+		return status;
 	}
 
-	public Round getRound() {
-		return round;
+	public void setStatus(int status) {
+		this.status = status;
 	}
+
 }

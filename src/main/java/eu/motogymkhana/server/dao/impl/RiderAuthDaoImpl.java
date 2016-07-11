@@ -44,23 +44,35 @@ public class RiderAuthDaoImpl implements RiderAuthDao {
 						+ " = :email", RiderAuth.class);
 
 		RiderAuth auth = query.setParameter("email", email).getSingleResult();
-		
+
 		return auth;
 	}
-	
+
 	@Override
 	public boolean checkPasswordHash(String email, String hash) {
 
 		EntityManager em = emp.get();
 
 		TypedQuery<RiderAuth> query = em.createQuery(
-				"select a from " + Password.class.getSimpleName() + " a where "
-						+ RiderAuth.EMAIL + " = :email", RiderAuth.class);
+				"select a from " + RiderAuth.class.getSimpleName() + " a where " + RiderAuth.EMAIL
+						+ " = :email", RiderAuth.class);
 
 		RiderAuth auth = query.setParameter("email", email).getSingleResult();
 
-		return auth != null
-				&& auth.getPasswordHash().equals(hash);
+		return auth != null && hash != null && hash.equals(auth.getPasswordHash());
 	}
 
+	@Override
+	public void create(RiderAuth riderAuth) {
+		emp.get().persist(riderAuth);
+	}
+
+	@Override
+	public void delete(String email) {
+
+		RiderAuth auth = get(email);
+		if (auth != null) {
+			emp.get().remove(auth);
+		}
+	}
 }

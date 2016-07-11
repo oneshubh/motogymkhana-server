@@ -15,10 +15,10 @@ import org.junit.runner.RunWith;
 
 import com.google.inject.Inject;
 
-import eu.motogymkhana.server.api.GymkhanaRequest;
-import eu.motogymkhana.server.api.ListRidersResult;
-import eu.motogymkhana.server.api.UpdateRiderRequest;
-import eu.motogymkhana.server.api.UploadRidersRequest;
+import eu.motogymkhana.server.api.request.GymkhanaRequest;
+import eu.motogymkhana.server.api.request.UpdateRiderRequest;
+import eu.motogymkhana.server.api.request.UploadRidersRequest;
+import eu.motogymkhana.server.api.result.ListRidersResult;
 import eu.motogymkhana.server.model.Country;
 import eu.motogymkhana.server.model.Rider;
 import eu.motogymkhana.server.model.Round;

@@ -8,6 +8,8 @@ import eu.motogymkhana.server.resource.UploadRidersResource;
 import eu.motogymkhana.server.resource.server.GetRidersServerResource;
 import eu.motogymkhana.server.resource.server.UpdateRiderServerResource;
 import eu.motogymkhana.server.resource.server.UploadRidersServerResource;
+import eu.motogymkhana.server.resource.ui.RegisterRiderResource;
+import eu.motogymkhana.server.resource.ui.server.RegisterRiderServerResource;
 
 /**
  * 
@@ -22,5 +24,6 @@ public class GymkhanaTestModule extends AbstractModule {
 		bind(UpdateRiderResource.class).to(UpdateRiderServerResource.class);
 		bind(GetRidersResource.class).to(GetRidersServerResource.class);
 		bind(UploadRidersResource.class).to(UploadRidersServerResource.class);
+		bind(RegisterRiderResource.class).to(RegisterRiderServerResource.class);
 	}
 }

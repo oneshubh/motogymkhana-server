@@ -5,9 +5,12 @@
  * http://www. apache.org/licenses/LICENSE-2.0.
  *  
  *******************************************************************************/
-package eu.motogymkhana.server.api;
+package eu.motogymkhana.server.api.result;
 
-public class TokenRequest extends GymkhanaRequest{
 
-	private String email;
+public class SigninRiderResult extends GymkhanaResult{
+
+	public static final int OK = 0;
+	public static final int NOT_OK = -1;
+
 }

@@ -7,7 +7,7 @@
  *******************************************************************************/
 package eu.motogymkhana.server.resource;
 
-import eu.motogymkhana.server.api.UpdateTextRequest;
+import eu.motogymkhana.server.api.request.UpdateTextRequest;
 
 public interface UpdateTextResource {
 

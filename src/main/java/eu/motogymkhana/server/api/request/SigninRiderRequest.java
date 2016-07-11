@@ -5,18 +5,18 @@
  * http://www. apache.org/licenses/LICENSE-2.0.
  *  
  *******************************************************************************/
-package eu.motogymkhana.server.api;
+package eu.motogymkhana.server.api.request;
 
-public class RegisterRiderRequest extends GymkhanaRequest{
+public class SigninRiderRequest extends GymkhanaRequest{
 
 	private String email;
-	private String token;
+	private String password;
 	
 	public String getEmail() {
 		return email;
 	}
 
-	public String getToken() {
-		return token;
+	public String getPassword() {
+		return password;
 	}
 }

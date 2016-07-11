@@ -5,13 +5,18 @@
  * http://www. apache.org/licenses/LICENSE-2.0.
  *  
  *******************************************************************************/
-package eu.motogymkhana.server.resource.ui;
+package eu.motogymkhana.server.api.request;
 
-import eu.motogymkhana.server.api.request.RegisterRiderRequest;
-import eu.motogymkhana.server.api.result.RegisterRiderResult;
+public class RegisterRiderRequest extends GymkhanaRequest{
 
-public interface RegisterRiderResource {
+	protected String email;
+	private String token;
+	
+	public String getEmail() {
+		return email;
+	}
 
-	RegisterRiderResult register(RegisterRiderRequest request);
-
+	public String getToken() {
+		return token;
+	}
 }

@@ -19,8 +19,8 @@ import org.restlet.resource.ServerResource;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
-import eu.motogymkhana.server.api.GymkhanaRequest;
-import eu.motogymkhana.server.api.SettingsResult;
+import eu.motogymkhana.server.api.request.GymkhanaRequest;
+import eu.motogymkhana.server.api.result.SettingsResult;
 import eu.motogymkhana.server.dao.SettingsDao;
 import eu.motogymkhana.server.resource.GetSettingsResource;
 import eu.motogymkhana.server.settings.Settings;

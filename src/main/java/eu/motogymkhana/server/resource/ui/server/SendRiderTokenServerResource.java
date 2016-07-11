@@ -7,8 +7,6 @@
  *******************************************************************************/
 package eu.motogymkhana.server.resource.ui.server;
 
-import java.util.List;
-
 import javax.persistence.EntityManager;
 
 import org.restlet.Context;
@@ -20,30 +18,26 @@ import org.restlet.resource.ServerResource;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
-import eu.motogymkhana.server.api.GymkhanaRequest;
-import eu.motogymkhana.server.api.ListRidersResult;
-import eu.motogymkhana.server.api.TokenRequest;
-import eu.motogymkhana.server.dao.RiderDao;
-import eu.motogymkhana.server.dao.SettingsDao;
-import eu.motogymkhana.server.model.Rider;
+import eu.motogymkhana.server.api.request.TokenRequest;
+import eu.motogymkhana.server.api.result.RiderTokenResult;
+import eu.motogymkhana.server.dao.RiderAuthDao;
+import eu.motogymkhana.server.model.RiderAuth;
+import eu.motogymkhana.server.password.PasswordManager;
 import eu.motogymkhana.server.resource.ui.SendRiderTokenResource;
-import eu.motogymkhana.server.resource.ui.ShowRidersResource;
-import eu.motogymkhana.server.settings.Settings;
-import eu.motogymkhana.server.text.TextManager;
 
-public class SendRiderTokenServerResource  extends ServerResource implements SendRiderTokenResource{
-	
-	@Inject
-	private RiderDao riderDao;
-	
-	@Inject
-	private SettingsDao settingsDao;
+public class SendRiderTokenServerResource extends ServerResource implements SendRiderTokenResource {
 
 	@Inject
-	private TextManager textManager;
-	
+	private PasswordManager passwordManager;
+
+	@Inject
+	private RiderAuthDao riderAuthDao;
+
 	@Inject
 	private Provider<EntityManager> emp;
+	
+	// 3 days
+	private long tokenValidity = 259200000l;
 
 	@Override
 	public void init(Context context, Request request, Response response) {
@@ -52,25 +46,35 @@ public class SendRiderTokenServerResource  extends ServerResource implements Sen
 
 	@Override
 	@Post
-	public ListRidersResult sendToken(TokenRequest request) {
+	public RiderTokenResult sendToken(TokenRequest request) {
 
-		ListRidersResult result = new ListRidersResult();
-		result.setResult(-1);
-		result.setText(textManager.getText());
+		RiderTokenResult result = new RiderTokenResult();
+		result.setResultCode(0);
 
+		if (request.getEmail() == null || request.getToken() == null) {
+			result.setResultCode(-1);
+			return result;
+		}
+		
 		EntityManager em = emp.get();
 
 		em.getTransaction().begin();
-		
+
 		try {
-			List<Rider> riders = riderDao.getRiders(request.getCountry(),request.getSeason());
 			
-			result.setRiders(riders);
+			RiderAuth auth = riderAuthDao.get(request.getEmail());
 			
-			Settings settings = settingsDao.getSettings(request.getCountry(), request.getSeason());
-			result.setSettings(settings);
-			
-			result.setResult(ListRidersResult.OK);
+			if(auth == null || !auth.hasToken() || !tokenStillValid(auth)){
+				result.setResultCode(-1);
+				return result;
+			}
+
+			if (request.getToken().equals(auth.getToken())) {
+				result.setResultCode(passwordManager.createRiderAccount(request));
+
+			} else {
+				result.setResultCode(-1);
+			}
 
 			em.getTransaction().commit();
 
@@ -78,7 +82,11 @@ public class SendRiderTokenServerResource  extends ServerResource implements Sen
 			e.printStackTrace();
 			em.getTransaction().rollback();
 		}
+
 		return result;
 	}
 
+	private boolean tokenStillValid(RiderAuth riderAuth) {
+		return (System.currentTimeMillis() - riderAuth.getTimeStamp()) < tokenValidity;
+	}
 }

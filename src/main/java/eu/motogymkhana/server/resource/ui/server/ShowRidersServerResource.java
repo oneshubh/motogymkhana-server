@@ -21,8 +21,8 @@ import org.restlet.resource.ServerResource;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
-import eu.motogymkhana.server.api.GymkhanaRequest;
-import eu.motogymkhana.server.api.ListRidersResult;
+import eu.motogymkhana.server.api.request.GymkhanaRequest;
+import eu.motogymkhana.server.api.result.ListRidersResult;
 import eu.motogymkhana.server.dao.RiderDao;
 import eu.motogymkhana.server.dao.SettingsDao;
 import eu.motogymkhana.server.guice.InjectLogger;

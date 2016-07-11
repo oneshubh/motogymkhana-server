@@ -7,8 +7,8 @@
  *******************************************************************************/
 package eu.motogymkhana.server.resource.ui;
 
-import eu.motogymkhana.server.api.GymkhanaRequest;
-import eu.motogymkhana.server.api.ListRidersResult;
+import eu.motogymkhana.server.api.request.GymkhanaRequest;
+import eu.motogymkhana.server.api.result.ListRidersResult;
 
 public interface ShowRidersResource {
 

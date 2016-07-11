@@ -5,19 +5,12 @@
  * http://www. apache.org/licenses/LICENSE-2.0.
  *  
  *******************************************************************************/
-package eu.motogymkhana.server.api;
+package eu.motogymkhana.server.api.result;
 
-import eu.motogymkhana.server.settings.Settings;
 
-public class UploadSettingsRequest extends GymkhanaRequest{
-	
-	private Settings settings;
-	
-	public UploadSettingsRequest(){
-		
-	}
-	
-	public Settings getSettings(){
-		return settings;
-	}
+public class RegisterRiderResult extends GymkhanaResult{
+
+	public static final int OK = 0;
+	public static final int NOT_OK = -1;
+
 }

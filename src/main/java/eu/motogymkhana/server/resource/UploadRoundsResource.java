@@ -7,8 +7,8 @@
  *******************************************************************************/
 package eu.motogymkhana.server.resource;
 
-import eu.motogymkhana.server.api.UploadRoundsRequest;
-import eu.motogymkhana.server.api.UploadRoundsResponse;
+import eu.motogymkhana.server.api.request.UploadRoundsRequest;
+import eu.motogymkhana.server.api.response.UploadRoundsResponse;
 
 public interface UploadRoundsResource {
 

@@ -1,4 +1,6 @@
 /*******************************************************************************
+
+
  * Copyright (c) 2015, 2016, Christine Karman
  * This project is free software: you can redistribute it and/or modify it under the terms of
  * the Apache License, Version 2.0. You can find a copy of the license at
@@ -10,16 +12,19 @@ package eu.motogymkhana.server.password.impl;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import javax.persistence.NoResultException;
+
 import org.apache.commons.codec.binary.Base64;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import eu.motogymkhana.server.ServerConstants;
+import eu.motogymkhana.server.api.request.TokenRequest;
 import eu.motogymkhana.server.dao.PasswordDao;
 import eu.motogymkhana.server.dao.RiderAuthDao;
 import eu.motogymkhana.server.model.Country;
-import eu.motogymkhana.server.model.Password;
+import eu.motogymkhana.server.model.RiderAuth;
 import eu.motogymkhana.server.password.PasswordManager;
 
 @Singleton
@@ -50,8 +55,13 @@ public class PasswordManagerImpl implements PasswordManager {
 
 	@Override
 	public boolean checkRiderPassword(String email, String password) {
+
 		if (password != null && password.length() >= 6) {
-			return riderAuthDao.checkPasswordHash(email, createHash(password));
+			try {
+				return riderAuthDao.checkPasswordHash(email, createHash(password));
+			} catch (NoResultException nre) {
+				return false;
+			}
 		} else {
 			return false;
 		}
@@ -82,5 +92,19 @@ public class PasswordManagerImpl implements PasswordManager {
 	private void createPasswords() {
 		passwordDao.store(Country.NL, nlPasswordHash);
 		passwordDao.store(Country.EU, nlPasswordHash);
+	}
+
+	@Override
+	public int createRiderAccount(TokenRequest request) {
+
+		try {
+			RiderAuth auth = riderAuthDao.get(request.getEmail());
+			auth.setPasswordHash(createHash(request.getPassword()));
+			auth.removeToken();
+			return 0;
+
+		} catch (Exception e) {
+			return -1;
+		}
 	}
 }

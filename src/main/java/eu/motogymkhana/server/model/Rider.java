@@ -70,11 +70,11 @@ public class Rider {
 
 	@JsonProperty(SEASON)
 	@Column(name = SEASON)
-	private int season;
+	protected int season;
 
 	@JsonProperty(COUNTRY)
 	@Column(name = COUNTRY)
-	private Country country;
+	protected Country country;
 
 	@JsonProperty(NATIONALITY)
 	@Column(name = NATIONALITY)
@@ -106,7 +106,7 @@ public class Rider {
 
 	@JsonProperty(value = EMAIL, access = Access.WRITE_ONLY)
 	@Column(name = EMAIL)
-	private String email;
+	protected String email;
 
 	@JsonProperty(RIDER_NUMBER)
 	@Column(name = RIDER_NUMBER)
@@ -224,7 +224,7 @@ public class Rider {
 		return dateOfBirth;
 	}
 
-	private String getEmail() {
+	public String getEmail() {
 		return email;
 	}
 
@@ -461,6 +461,19 @@ public class Rider {
 		gender = rider.getGender();
 		bib = rider.getBib();
 
+		if (rider.hasText()) {
+			text = rider.getText();
+		}
+		if (rider.hasBike()) {
+			bike = rider.getBike();
+		}
+		if (rider.hasImageUrl()) {
+			imageUrl = rider.getImageUrl();
+		}
+		if (rider.hasBikeImageUrl()) {
+			bikeImageUrl = rider.getBikeImageUrl();
+		}
+
 		log.debug("xtien existing size = " + timesList.size() + " new size = "
 				+ rider.getTimes().size());
 
@@ -494,6 +507,26 @@ public class Rider {
 
 			}
 		}
+	}
+
+	private String getImageUrl() {
+		return imageUrl;
+	}
+
+	private boolean hasImageUrl() {
+		return imageUrl != null;
+	}
+
+	private boolean hasBikeImageUrl() {
+		return bikeImageUrl != null;
+	}
+
+	private boolean hasText() {
+		return text != null;
+	}
+
+	private boolean hasBike() {
+		return bike != null;
 	}
 
 	private Country getNationality() {
@@ -568,5 +601,13 @@ public class Rider {
 
 	public String getFullName() {
 		return firstName + " " + lastName;
+	}
+
+	public void setRiderNumber(int number) {
+		this.riderNumber = number;
+	}
+
+	public boolean hasEmail() {
+		return email != null;
 	}
 }

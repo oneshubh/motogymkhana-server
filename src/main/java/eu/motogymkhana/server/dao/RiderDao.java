@@ -9,7 +9,7 @@ package eu.motogymkhana.server.dao;
 
 import java.util.List;
 
-import eu.motogymkhana.server.api.UploadRidersResponse;
+import eu.motogymkhana.server.api.response.UploadRidersResponse;
 import eu.motogymkhana.server.model.Country;
 import eu.motogymkhana.server.model.Rider;
 import eu.motogymkhana.server.model.Round;
@@ -29,4 +29,6 @@ public interface RiderDao {
 	List<Rider> getRegisteredRidersForDate(Round round);
 
 	Rider getRiderForNumber(Country country, int season, int riderNumber);
+
+	Rider getRiderByEmail(Country country, int season, String email);
 }
