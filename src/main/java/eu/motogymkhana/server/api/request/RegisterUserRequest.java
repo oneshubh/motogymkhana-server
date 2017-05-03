@@ -7,7 +7,7 @@
  *******************************************************************************/
 package eu.motogymkhana.server.api.request;
 
-public class RegisterRiderRequest extends GymkhanaRequest{
+public class RegisterUserRequest extends GymkhanaRequest{
 
 	protected String email;
 	private String token;

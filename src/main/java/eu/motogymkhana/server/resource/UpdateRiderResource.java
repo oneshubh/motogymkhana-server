@@ -8,6 +8,7 @@
 package eu.motogymkhana.server.resource;
 
 import eu.motogymkhana.server.api.request.UpdateRiderRequest;
+import eu.motogymkhana.server.api.response.UpdateRegistrationResponse;
 import eu.motogymkhana.server.api.response.UpdateRiderResponse;
 
 public interface UpdateRiderResource {

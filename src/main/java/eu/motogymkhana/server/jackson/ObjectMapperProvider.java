@@ -19,13 +19,38 @@ import com.google.inject.Provider;
  */
 public class ObjectMapperProvider implements Provider<ObjectMapper> {
 
-	private static ObjectMapper mapper = new ObjectMapper() {
-		{
-			configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-		}
-	};
+	private static ObjectMapper mapper;
 
 	public ObjectMapper get() {
+		if (mapper == null) {
+			createMapper();
+		}
 		return mapper;
+	}
+
+	private void createMapper() {
+
+		mapper = new ObjectMapper();
+		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+		
+		// mapper.setSerializationInclusion(Include.NON_EMPTY);
+		// mapper.registerModule(new SimpleModule() {
+		// private static final long serialVersionUID = 1L;
+		//
+		// @Override
+		// public void setupModule(SetupContext context) {
+		// super.setupModule(context);
+		// context.addBeanSerializerModifier(new BeanSerializerModifier() {
+		// @Override
+		// public JsonSerializer<?> modifySerializer(SerializationConfig config,
+		// BeanDescription desc, JsonSerializer<?> serializer) {
+		// if (Hidable.class.isAssignableFrom(desc.getBeanClass())) {
+		// return new HidableSerializer((JsonSerializer<Object>) serializer);
+		// }
+		// return serializer;
+		// }
+		// });
+		// }
+		// });
 	}
 }

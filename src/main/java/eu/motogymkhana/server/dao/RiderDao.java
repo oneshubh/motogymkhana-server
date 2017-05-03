@@ -16,7 +16,7 @@ import eu.motogymkhana.server.model.Round;
 
 public interface RiderDao {
 
-	int updateRider(Rider rider);
+	Rider updateRider(Rider rider);
 
 	int uploadRiders(Country country, int season, List<Rider> riders);
 
@@ -30,5 +30,13 @@ public interface RiderDao {
 
 	Rider getRiderForNumber(Country country, int season, int riderNumber);
 
-	Rider getRiderByEmail(Country country, int season, String email);
+	Rider getRiderByEmail(String email);
+
+	List<Rider> getAllRiders();
+
+	Rider getRider(Rider rider);
+
+	Rider getRegisteredRiderByName(Rider rider);
+
+	void remove(Rider rider);
 }

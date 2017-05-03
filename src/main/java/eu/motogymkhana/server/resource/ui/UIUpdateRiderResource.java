@@ -1,9 +1,9 @@
 package eu.motogymkhana.server.resource.ui;
 
 import eu.motogymkhana.server.api.request.UpdateRiderRequest;
-import eu.motogymkhana.server.api.response.UpdateRiderResponse;
+import eu.motogymkhana.server.api.response.UpdateRegistrationResponse;
 
 public interface UIUpdateRiderResource {
 
-	UpdateRiderResponse updateRider(UpdateRiderRequest request);
+	UpdateRegistrationResponse updateRider(UpdateRiderRequest request);
 }

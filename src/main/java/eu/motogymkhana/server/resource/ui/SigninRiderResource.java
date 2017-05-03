@@ -9,7 +9,6 @@ package eu.motogymkhana.server.resource.ui;
 
 import eu.motogymkhana.server.api.request.SigninRiderRequest;
 import eu.motogymkhana.server.api.result.SigninRiderResult;
-import eu.motogymkhana.server.api.result.RegisterRiderResult;
 
 public interface SigninRiderResource {
 	

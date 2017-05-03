@@ -38,6 +38,7 @@ public class PasswordManagerImpl implements PasswordManager {
 
 	private String nlPasswordHash = "aVPXVxwCy9tyU+RqbtLLsjwbtE40z9ZTDEvbubQ8I/c=";
 	private String uaPasswordHash = "r/OZGL5gdtMwFKkncxOhXN5/7qhZLp3xO1RoDZfzsUk=";
+	private String mdPasswordHash = "NmioBU99ZD3omW7zbbnSmxCEgxW9UvdkpABNRQutRto=";
 
 	@Override
 	public boolean checkPassword(Country country, String password) {

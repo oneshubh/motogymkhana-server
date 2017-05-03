@@ -49,10 +49,6 @@ public class Round {
 	@Column(name = COUNTRY)
 	private Country country;
 
-	@JsonIgnore
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
-	private Collection<Times> timesList = new LinkedList<Times>();
-
 	@Column(name = DATE)
 	@JsonProperty(DATE)
 	private Long date;

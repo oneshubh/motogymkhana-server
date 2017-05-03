@@ -9,13 +9,13 @@ import org.restlet.resource.Post;
 import org.restlet.resource.ServerResource;
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 
 import eu.motogymkhana.server.api.request.GetRiderRequest;
 import eu.motogymkhana.server.api.response.GetRiderResponse;
 import eu.motogymkhana.server.dao.RiderDao;
 import eu.motogymkhana.server.model.Rider;
 import eu.motogymkhana.server.password.PasswordManager;
+import eu.motogymkhana.server.persist.MyEntityManager;
 import eu.motogymkhana.server.resource.ui.UIGetRiderResource;
 
 public class UIGetRiderServerResource extends ServerResource implements UIGetRiderResource {
@@ -24,7 +24,7 @@ public class UIGetRiderServerResource extends ServerResource implements UIGetRid
 	private PasswordManager passwordManager;
 
 	@Inject
-	private Provider<EntityManager> emp;
+	private MyEntityManager emp;
 
 	@Inject
 	private RiderDao riderDao;
@@ -46,12 +46,12 @@ public class UIGetRiderServerResource extends ServerResource implements UIGetRid
 			return response;
 		}
 
-		EntityManager em = emp.get();
+		EntityManager em = emp.getEM();
+		em.clear();
 		em.getTransaction().begin();
 
 		try {
-			Rider rider = riderDao.getRiderByEmail(request.getCountry(), request.getSeason(),
-					request.getEmail());
+			Rider rider = riderDao.getRiderByEmail(request.getEmail());
 			response.setRider(rider);
 			response.setStatus(200);
 			em.getTransaction().commit();

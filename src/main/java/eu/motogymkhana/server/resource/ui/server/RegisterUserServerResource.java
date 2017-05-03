@@ -26,28 +26,24 @@ import org.restlet.resource.Post;
 import org.restlet.resource.ServerResource;
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 
-import eu.motogymkhana.server.api.request.RegisterRiderRequest;
+import eu.motogymkhana.server.api.request.RegisterUserRequest;
 import eu.motogymkhana.server.api.result.RegisterRiderResult;
 import eu.motogymkhana.server.dao.RiderAuthDao;
 import eu.motogymkhana.server.dao.RiderDao;
 import eu.motogymkhana.server.model.Rider;
 import eu.motogymkhana.server.model.RiderAuth;
-import eu.motogymkhana.server.password.PasswordManager;
+import eu.motogymkhana.server.persist.MyEntityManager;
 import eu.motogymkhana.server.properties.GymkhanaProperties;
-import eu.motogymkhana.server.resource.ui.RegisterRiderResource;
+import eu.motogymkhana.server.resource.ui.RegisterUserResource;
 
-public class RegisterRiderServerResource extends ServerResource implements RegisterRiderResource {
+public class RegisterUserServerResource extends ServerResource implements RegisterUserResource {
 
 	@Inject
 	private RiderAuthDao riderAuthDao;
 
 	@Inject
-	private PasswordManager passwordManager;
-
-	@Inject
-	private Provider<EntityManager> emp;
+	private MyEntityManager emp;
 
 	@Inject
 	private RiderDao riderDao;
@@ -61,12 +57,13 @@ public class RegisterRiderServerResource extends ServerResource implements Regis
 
 	@Override
 	@Post
-	public RegisterRiderResult register(RegisterRiderRequest request) {
+	public RegisterRiderResult register(RegisterUserRequest request) {
 
 		RegisterRiderResult result = new RegisterRiderResult();
 		result.setResultCode(-1);
 
-		EntityManager em = emp.get();
+		EntityManager em = emp.getEM();
+		em.clear();
 
 		em.getTransaction().begin();
 
@@ -81,8 +78,7 @@ public class RegisterRiderServerResource extends ServerResource implements Regis
 			}
 
 			try {
-				rider = riderDao.getRiderByEmail(request.getCountry(), request.getSeason(),
-						request.getEmail());
+				rider = riderDao.getRiderByEmail(request.getEmail());
 			} catch (NoResultException nre) {
 				result.setResultCode(-1);
 			}
@@ -121,7 +117,7 @@ public class RegisterRiderServerResource extends ServerResource implements Regis
 		String subject = GymkhanaProperties.getProperty("email_subject");
 
 		messageText = String.format(messageText, token);
-		String host = "localhost";
+		String host = GymkhanaProperties.getProperty("mailhost");
 		Properties properties = System.getProperties();
 		properties.setProperty("mail.smtp.host", host);
 		Session session = Session.getDefaultInstance(properties);

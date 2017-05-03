@@ -15,21 +15,19 @@ import org.restlet.Context;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.resource.Post;
-import org.restlet.resource.Put;
 import org.restlet.resource.ServerResource;
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 
 import eu.motogymkhana.server.api.request.UpdateRiderRequest;
-import eu.motogymkhana.server.api.response.UpdateRiderResponse;
+import eu.motogymkhana.server.api.response.UpdateRegistrationResponse;
 import eu.motogymkhana.server.dao.RiderAuthDao;
 import eu.motogymkhana.server.dao.RiderDao;
 import eu.motogymkhana.server.guice.InjectLogger;
 import eu.motogymkhana.server.model.Rider;
 import eu.motogymkhana.server.password.PasswordManager;
+import eu.motogymkhana.server.persist.MyEntityManager;
 import eu.motogymkhana.server.resource.DeleteRiderResource;
-import eu.motogymkhana.server.resource.UpdateRiderResource;
 
 public class DeleteRiderServerResource extends ServerResource implements DeleteRiderResource {
 
@@ -43,7 +41,7 @@ public class DeleteRiderServerResource extends ServerResource implements DeleteR
 	private PasswordManager pwManager;
 
 	@Inject
-	private Provider<EntityManager> emp;
+	private MyEntityManager emp;
 
 	@InjectLogger
 	private Log log;
@@ -55,9 +53,9 @@ public class DeleteRiderServerResource extends ServerResource implements DeleteR
 
 	@Override
 	@Post("json")
-	public UpdateRiderResponse deleteRider(UpdateRiderRequest request) {
+	public UpdateRegistrationResponse deleteRider(UpdateRiderRequest request) {
 
-		UpdateRiderResponse response = new UpdateRiderResponse();
+		UpdateRegistrationResponse response = new UpdateRegistrationResponse();
 
 		if (request.getRider() == null) {
 			response.setStatus(-1);
@@ -69,7 +67,8 @@ public class DeleteRiderServerResource extends ServerResource implements DeleteR
 			return response;
 		}
 
-		EntityManager em = emp.get();
+		EntityManager em = emp.getEM();
+		em.clear();
 		int result = -1;
 
 		em.getTransaction().begin();
@@ -82,7 +81,7 @@ public class DeleteRiderServerResource extends ServerResource implements DeleteR
 			if (existingRider != null) {
 				if (existingRider.hasEmail()) {
 					try {
-						riderAuthDao.delete(existingRider.getEmail());
+						riderAuthDao.delete(existingRider.getEmail().toString());
 					} catch (NoResultException nre) {
 						log.info("rider " + existingRider.getEmail() + " did not have auth object");
 					}

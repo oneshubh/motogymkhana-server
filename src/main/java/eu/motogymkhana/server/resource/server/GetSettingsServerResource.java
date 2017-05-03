@@ -12,16 +12,15 @@ import javax.persistence.EntityManager;
 import org.restlet.Context;
 import org.restlet.Request;
 import org.restlet.Response;
-import org.restlet.resource.Get;
 import org.restlet.resource.Post;
 import org.restlet.resource.ServerResource;
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 
 import eu.motogymkhana.server.api.request.GymkhanaRequest;
 import eu.motogymkhana.server.api.result.SettingsResult;
 import eu.motogymkhana.server.dao.SettingsDao;
+import eu.motogymkhana.server.persist.MyEntityManager;
 import eu.motogymkhana.server.resource.GetSettingsResource;
 import eu.motogymkhana.server.settings.Settings;
 
@@ -31,7 +30,7 @@ public class GetSettingsServerResource extends ServerResource implements GetSett
 	private SettingsDao settingsDao;
 
 	@Inject
-	private Provider<EntityManager> emp;
+	private MyEntityManager emp;
 
 	@Override
 	public void init(Context context, Request request, Response response) {
@@ -45,18 +44,21 @@ public class GetSettingsServerResource extends ServerResource implements GetSett
 		SettingsResult result = new SettingsResult();
 		result.setResultCode(0);
 		Settings settings = null;
+		
+		EntityManager em = emp.getEM();
+		em.clear();
 
-		emp.get().getTransaction().begin();
+		em.getTransaction().begin();
 
 		try {
 
 			settings = settingsDao.getSettings(request.getCountry(), request.getSeason());
 			result.setResultCode(200);
-			emp.get().getTransaction().commit();
+			em.getTransaction().commit();
 
 		} catch (Exception e) {
 			try {
-				emp.get().getTransaction().rollback();
+				em.getTransaction().rollback();
 			} catch (Exception ee) {
 
 			}

@@ -18,6 +18,7 @@ public class ServerConstants {
 	public static final String UPDATE_TEXT = "/updateText/";
 	public static final String DELETE_RIDER = "/deleteRider/";
 	public static final String GET_RIDERS = "/getRiders/";
+	public static final String GET_ALL_RIDERS = "/getAllRiders/";
 	public static final String UPLOAD_RIDERS = "/uploadRiders/";
 	public static final String UPDATE_RIDERS = "/updateRiders/";
 	public static final String UPLOAD_ROUNDS = "/uploadRounds/";

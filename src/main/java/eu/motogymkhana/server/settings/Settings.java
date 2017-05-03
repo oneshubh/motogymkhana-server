@@ -7,7 +7,6 @@
  *******************************************************************************/
 package eu.motogymkhana.server.settings;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -141,5 +140,9 @@ public class Settings {
 
 	public String getPoints() {
 		return points;
+	}
+
+	public int get_id() {
+		return _id;
 	}
 }

@@ -8,9 +8,9 @@
 package eu.motogymkhana.server.resource;
 
 import eu.motogymkhana.server.api.request.UpdateRiderRequest;
-import eu.motogymkhana.server.api.response.UpdateRiderResponse;
+import eu.motogymkhana.server.api.response.UpdateRegistrationResponse;
 
 public interface DeleteRiderResource {
 
-	public UpdateRiderResponse deleteRider(UpdateRiderRequest request);
+	public UpdateRegistrationResponse deleteRider(UpdateRiderRequest request);
 }

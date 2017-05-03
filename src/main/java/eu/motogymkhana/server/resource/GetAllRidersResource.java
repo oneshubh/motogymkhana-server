@@ -5,16 +5,14 @@
  * http://www. apache.org/licenses/LICENSE-2.0.
  *  
  *******************************************************************************/
-package eu.motogymkhana.server.model;
+package eu.motogymkhana.server.resource;
 
-import java.util.Collection;
-import java.util.HashMap;
+import eu.motogymkhana.server.api.request.GymkhanaRequest;
+import eu.motogymkhana.server.api.result.ListRidersResult;
+import eu.motogymkhana.server.model.Country;
 
-public class RonaldMembers {
 
-	private Object members;
-	
-	public Collection<RonaldRider> getRiders(){
-		return null;
-	}
+public interface GetAllRidersResource {
+
+	public ListRidersResult getRiders(GymkhanaRequest request);
 }

@@ -7,6 +7,8 @@
  *******************************************************************************/
 package eu.motogymkhana.server.resource.server;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -19,22 +21,35 @@ import org.restlet.resource.Post;
 import org.restlet.resource.ServerResource;
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 
 import eu.motogymkhana.server.api.request.GymkhanaRequest;
 import eu.motogymkhana.server.api.result.ListRidersResult;
+import eu.motogymkhana.server.conversion.ConvertRegistration;
+import eu.motogymkhana.server.dao.PasswordDao;
+import eu.motogymkhana.server.dao.RegistrationDao;
 import eu.motogymkhana.server.dao.RiderDao;
 import eu.motogymkhana.server.dao.SettingsDao;
 import eu.motogymkhana.server.guice.InjectLogger;
+import eu.motogymkhana.server.model.Registration;
 import eu.motogymkhana.server.model.Rider;
+import eu.motogymkhana.server.model.Times;
+import eu.motogymkhana.server.password.PasswordManager;
+import eu.motogymkhana.server.persist.MyEntityManager;
 import eu.motogymkhana.server.resource.GetRidersResource;
 import eu.motogymkhana.server.settings.Settings;
 import eu.motogymkhana.server.text.TextManager;
 
 public class GetRidersServerResource extends ServerResource implements GetRidersResource {
+	private static DateFormat dateFormat = new SimpleDateFormat("hh:mm:ssSS");
 
 	@Inject
 	private RiderDao riderDao;
+
+	@Inject
+	private RegistrationDao registrationDao;
+
+	@Inject
+	private ConvertRegistration convert;
 
 	@Inject
 	private SettingsDao settingsDao;
@@ -42,11 +57,14 @@ public class GetRidersServerResource extends ServerResource implements GetRiders
 	@Inject
 	private TextManager textManager;
 
+	@Inject
+	private PasswordManager passwordManager;
+
 	@InjectLogger
 	private Log log;
 
 	@Inject
-	private Provider<EntityManager> emp;
+	private MyEntityManager emp;
 
 	@Override
 	public void init(Context context, Request request, Response response) {
@@ -57,21 +75,44 @@ public class GetRidersServerResource extends ServerResource implements GetRiders
 	@Post
 	public ListRidersResult getRiders(GymkhanaRequest request) {
 
+		boolean isAdmin = false;
+		EntityManager em = emp.getEM();
+		em.clear();
+
+		if (request.hasPassword()) {
+			isAdmin = passwordManager.checkPassword(request.getCountry(), (request.getPassword()));
+		}
+
+		if (registrationDao.isEmpty()) {
+
+			try {
+
+				em.getTransaction().begin();
+				convert.initRegistrations();
+				em.getTransaction().commit();
+
+				em.clear();
+
+				em.getTransaction().begin();
+				convert.removeUnregisteredRiders();
+				em.getTransaction().commit();
+
+			} catch (Exception e) {
+				e.printStackTrace();
+				em.getTransaction().rollback();
+			}
+		}
+
 		ListRidersResult result = new ListRidersResult();
 		result.setResult(-1);
 		result.setText(textManager.getText());
-
-		if (request == null) {
-			return result;
-		}
-
-		EntityManager em = emp.get();
 
 		em.getTransaction().begin();
 
 		try {
 
 			List<Rider> riders = riderDao.getRiders(request.getCountry(), request.getSeason());
+
 			result.setRiders(riders);
 
 			Settings settings = settingsDao.getSettings(request.getCountry(), request.getSeason());

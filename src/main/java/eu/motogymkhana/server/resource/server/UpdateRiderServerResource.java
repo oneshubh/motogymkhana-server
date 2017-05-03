@@ -9,33 +9,39 @@ package eu.motogymkhana.server.resource.server;
 
 import javax.persistence.EntityManager;
 
+import org.apache.commons.logging.Log;
 import org.restlet.Context;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.resource.Post;
-import org.restlet.resource.Put;
 import org.restlet.resource.ServerResource;
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 
 import eu.motogymkhana.server.api.request.UpdateRiderRequest;
 import eu.motogymkhana.server.api.response.UpdateRiderResponse;
 import eu.motogymkhana.server.dao.RiderDao;
+import eu.motogymkhana.server.guice.InjectLogger;
+import eu.motogymkhana.server.model.Registration;
 import eu.motogymkhana.server.model.Rider;
+import eu.motogymkhana.server.model.Times;
 import eu.motogymkhana.server.password.PasswordManager;
+import eu.motogymkhana.server.persist.MyEntityManager;
 import eu.motogymkhana.server.resource.UpdateRiderResource;
 
 public class UpdateRiderServerResource extends ServerResource implements UpdateRiderResource {
 
 	@Inject
 	private RiderDao riderDao;
-	
+
 	@Inject
 	private PasswordManager pwManager;
 
 	@Inject
-	private Provider<EntityManager> emp;
+	private MyEntityManager emp;
+
+	@InjectLogger
+	private Log log;
 
 	@Override
 	public void init(Context context, Request request, Response response) {
@@ -47,27 +53,37 @@ public class UpdateRiderServerResource extends ServerResource implements UpdateR
 	public UpdateRiderResponse updateRider(UpdateRiderRequest request) {
 
 		UpdateRiderResponse response = new UpdateRiderResponse();
-		
-		if(!pwManager.checkPassword(request.getCountry(), request.getPassword())){	
+
+		if (!pwManager.checkPassword(request.getCountry(), request.getPassword())) {
 			response.setStatus(404);
 			return response;
 		}
 
-		EntityManager em = emp.get();
+		EntityManager em = emp.getEM();
+		em.clear();
 
 		em.getTransaction().begin();
 
+		log.debug("update rider " + request.getRider().getFullName());
+		
 		try {
 
-			int result = riderDao.updateRider(request.getRider());
+			Rider resultRider = riderDao.updateRider(request.getRider());
 
-			response.setStatus(result);
+			response.setStatus(0);
+			response.setRider(resultRider);
 
 			em.getTransaction().commit();
 
+			log.debug("rider updated: " + resultRider.getFullName());
+
 		} catch (Exception e) {
 			e.printStackTrace();
-			em.getTransaction().rollback();
+			try {
+				em.getTransaction().rollback();
+			} catch (Exception ee) {
+
+			}
 		}
 
 		return response;

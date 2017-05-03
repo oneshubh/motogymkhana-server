@@ -17,7 +17,7 @@ public class GymkhanaRequest {
 
 	public GymkhanaRequest() {
 	}
-	
+
 	public GymkhanaRequest(Country country, int season) {
 		this.country = country;
 		this.season = season;
@@ -33,5 +33,9 @@ public class GymkhanaRequest {
 
 	public int getSeason() {
 		return season;
+	}
+
+	public boolean hasPassword() {
+		return password != null && password.length() > 4;
 	}
 }

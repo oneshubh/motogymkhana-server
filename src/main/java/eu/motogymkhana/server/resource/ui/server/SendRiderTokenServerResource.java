@@ -16,13 +16,13 @@ import org.restlet.resource.Post;
 import org.restlet.resource.ServerResource;
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 
 import eu.motogymkhana.server.api.request.TokenRequest;
 import eu.motogymkhana.server.api.result.RiderTokenResult;
 import eu.motogymkhana.server.dao.RiderAuthDao;
 import eu.motogymkhana.server.model.RiderAuth;
 import eu.motogymkhana.server.password.PasswordManager;
+import eu.motogymkhana.server.persist.MyEntityManager;
 import eu.motogymkhana.server.resource.ui.SendRiderTokenResource;
 
 public class SendRiderTokenServerResource extends ServerResource implements SendRiderTokenResource {
@@ -34,7 +34,7 @@ public class SendRiderTokenServerResource extends ServerResource implements Send
 	private RiderAuthDao riderAuthDao;
 
 	@Inject
-	private Provider<EntityManager> emp;
+	private MyEntityManager emp;
 	
 	// 3 days
 	private long tokenValidity = 259200000l;
@@ -56,7 +56,8 @@ public class SendRiderTokenServerResource extends ServerResource implements Send
 			return result;
 		}
 		
-		EntityManager em = emp.get();
+		EntityManager em = emp.getEM();
+		em.clear();
 
 		em.getTransaction().begin();
 

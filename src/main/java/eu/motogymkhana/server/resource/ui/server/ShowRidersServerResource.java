@@ -7,6 +7,8 @@
  *******************************************************************************/
 package eu.motogymkhana.server.resource.ui.server;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -19,23 +21,31 @@ import org.restlet.resource.Post;
 import org.restlet.resource.ServerResource;
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 
 import eu.motogymkhana.server.api.request.GymkhanaRequest;
 import eu.motogymkhana.server.api.result.ListRidersResult;
+import eu.motogymkhana.server.conversion.ConvertRegistration;
+import eu.motogymkhana.server.dao.RegistrationDao;
 import eu.motogymkhana.server.dao.RiderDao;
 import eu.motogymkhana.server.dao.SettingsDao;
 import eu.motogymkhana.server.guice.InjectLogger;
-import eu.motogymkhana.server.model.Country;
+import eu.motogymkhana.server.model.Registration;
 import eu.motogymkhana.server.model.Rider;
+import eu.motogymkhana.server.model.Times;
+import eu.motogymkhana.server.persist.MyEntityManager;
 import eu.motogymkhana.server.resource.ui.ShowRidersResource;
 import eu.motogymkhana.server.settings.Settings;
 import eu.motogymkhana.server.text.TextManager;
 
 public class ShowRidersServerResource extends ServerResource implements ShowRidersResource {
 
+	private static DateFormat dateFormat = new SimpleDateFormat("hh:mm:ssSS");
+
 	@Inject
 	private RiderDao riderDao;
+
+	@Inject
+	private RegistrationDao registrationDao;
 
 	@InjectLogger
 	private Log log;
@@ -47,7 +57,10 @@ public class ShowRidersServerResource extends ServerResource implements ShowRide
 	private TextManager textManager;
 
 	@Inject
-	private Provider<EntityManager> emp;
+	private ConvertRegistration convert;
+
+	@Inject
+	private MyEntityManager emp;
 
 	@Override
 	public void init(Context context, Request request, Response response) {
@@ -58,16 +71,44 @@ public class ShowRidersServerResource extends ServerResource implements ShowRide
 	@Post
 	public ListRidersResult getRiders(GymkhanaRequest request) {
 
+		if (registrationDao.isEmpty()) {
+			convert.initRegistrations();
+		}
+
 		ListRidersResult result = new ListRidersResult();
 		result.setResult(-1);
 		result.setText(textManager.getText());
 
-		EntityManager em = emp.get();
+		EntityManager em = emp.getEM();
+		em.clear();
 
 		em.getTransaction().begin();
 
 		try {
 			List<Rider> riders = riderDao.getRiders(request.getCountry(), request.getSeason());
+
+			for (Rider rider : riders) {
+//				if (rider.hasRegistrations()) {
+//					for (Registration registration : rider.getRegistrations()) {
+//						log.debug("registration " + " " + rider.getFullName() + " "
+//								+ registration.toString());
+//					}
+//				} else {
+//					log.debug("rider " + rider.getFullName() + " " + rider.get_id()
+//							+ " does not have registrations");
+//				}
+//				if (rider.hasTimes()) {
+//					for (Times t : rider.getTimes()) {
+//						log.debug("times 1 " + t.getTime1() + " " + dateFormat.format(t.getTime1())
+//								+ " " + " time 2 " + t.getTime2() + " "
+//								+ dateFormat.format(t.getTime2()));
+//					}
+//				}
+				
+				if(rider.isHideLastname()){
+					rider.setLastName("");
+				}
+		}
 
 			result.setRiders(riders);
 
@@ -88,5 +129,4 @@ public class ShowRidersServerResource extends ServerResource implements ShowRide
 		}
 		return result;
 	}
-
 }

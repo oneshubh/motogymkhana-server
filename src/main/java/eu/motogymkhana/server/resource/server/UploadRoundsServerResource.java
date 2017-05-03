@@ -16,12 +16,12 @@ import org.restlet.resource.Post;
 import org.restlet.resource.ServerResource;
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 
 import eu.motogymkhana.server.api.request.UploadRoundsRequest;
 import eu.motogymkhana.server.api.response.UploadRoundsResponse;
 import eu.motogymkhana.server.dao.RoundDao;
 import eu.motogymkhana.server.password.PasswordManager;
+import eu.motogymkhana.server.persist.MyEntityManager;
 import eu.motogymkhana.server.resource.UploadRoundsResource;
 
 public class UploadRoundsServerResource extends ServerResource implements UploadRoundsResource {
@@ -33,7 +33,7 @@ public class UploadRoundsServerResource extends ServerResource implements Upload
 	private PasswordManager pwManager;
 
 	@Inject
-	private Provider<EntityManager> emp;
+	private MyEntityManager emp;
 
 	@Override
 	public void init(Context context, Request request, Response response) {
@@ -51,7 +51,8 @@ public class UploadRoundsServerResource extends ServerResource implements Upload
 			return response;
 		}
 
-		EntityManager em = emp.get();
+		EntityManager em = emp.getEM();
+		em.clear();
 
 		em.getTransaction().begin();
 

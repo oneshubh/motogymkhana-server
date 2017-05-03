@@ -15,59 +15,32 @@ import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 
-import eu.motogymkhana.server.dao.RiderDao;
 import eu.motogymkhana.server.dao.TimesDao;
 import eu.motogymkhana.server.model.Country;
-import eu.motogymkhana.server.model.Rider;
 import eu.motogymkhana.server.model.Times;
+import eu.motogymkhana.server.persist.MyEntityManager;
 
 public class TimesDaoImpl implements TimesDao {
 
-	private Provider<EntityManager> emp;
-	private RiderDao riderDao;
+	private MyEntityManager emp;
 
 	@Inject
-	public TimesDaoImpl(Provider<EntityManager> emp, RiderDao riderDao) {
+	public TimesDaoImpl(MyEntityManager emp) {
 		this.emp = emp;
-		this.riderDao = riderDao;
 	}
 
 	@Override
 	public int update(Times times) {
 
-		EntityManager em = emp.get();
+		EntityManager em = emp.getEM();
 
 		try {
 
-			TypedQuery<Times> query = em
-					.createQuery(
-							"select a from "
-									+ Times.class.getSimpleName()
-									+ " a where a.rider.riderNumber = :number and a.country = :country and a.season = :season and a.date = :date",
-							Times.class);
-			Times existingTimes = null;
-
-			try {
-				existingTimes = query.setParameter("country", times.getCountry())
-						.setParameter("season", times.getSeason())
-						.setParameter("date", times.getDate())
-						.setParameter("number", times.getRiderNumber()).getSingleResult();
-
-			} catch (NoResultException nre) {
-			}
-
-			if (existingTimes == null) {
-
-				Rider rider = riderDao.getRiderForNumber(times.getCountry(), times.getSeason(),
-						times.getRiderNumber());
-				times.setRider(rider);
-				em.persist(times);
-				rider.addTimes(times);
-
+			if (times.getRider().hasId()) {
+				em.merge(times.getRider());
 			} else {
-				existingTimes.merge(times);
+				em.persist(times.getRider());
 			}
 
 		} catch (Exception e) {
@@ -81,16 +54,14 @@ public class TimesDaoImpl implements TimesDao {
 	@Override
 	public List<Times> getTimes(Country country, int season, long date) {
 
-		EntityManager em = emp.get();
-		
+		EntityManager em = emp.getEM();
+
 		List<Times> result = new ArrayList<Times>();
 
-		TypedQuery<Times> query = em
-				.createQuery(
-						"select a from "
-								+ Times.class.getSimpleName()
-								+ " a where a.country = :country and a.season = :season and a.date = :date",
-						Times.class);
+		TypedQuery<Times> query = em.createQuery(
+				"select a from " + Times.class.getSimpleName()
+						+ " a where a.country = :country and a.season = :season and a.date = :date",
+				Times.class);
 
 		try {
 			result = query.setParameter("country", country).setParameter("season", season)
@@ -100,5 +71,25 @@ public class TimesDaoImpl implements TimesDao {
 		}
 
 		return result;
+	}
+
+	@Override
+	public List<Times> getTimesForRiderId(int id) {
+
+		EntityManager em = emp.getEM();
+
+		List<Times> result = new ArrayList<Times>();
+
+		TypedQuery<Times> query = em.createQuery(
+				"select a from " + Times.class.getSimpleName() + " a where a.rider.id = :riderId",
+				Times.class);
+
+		try {
+			result = query.setParameter("riderId", id).getResultList();
+
+		} catch (NoResultException nre) {
+		}
+		return result;
+
 	}
 }

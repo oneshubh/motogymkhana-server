@@ -7,28 +7,34 @@
  *******************************************************************************/
 package eu.motogymkhana.server.model;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.eclipse.persistence.annotations.Cache;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
 @Table(name = "times")
 public class Times {
+
+	private static final Log log = LogFactory.getLog(Rider.class);
+	private static DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss");
 
 	public static final String FIRSTNAME = "firstname";
 	public static final String LASTNAME = "lastname";
@@ -66,7 +72,7 @@ public class Times {
 	@Column(name = TIMESTAMP)
 	private long timeStamp;
 
-	@JsonIgnore
+	@JsonBackReference
 	@ManyToOne(cascade = CascadeType.ALL)
 	private Rider rider;
 
@@ -123,6 +129,22 @@ public class Times {
 
 	public Times(long date) {
 		this.date = date;
+	}
+
+	public Times(Times times) {
+		this.startNumber = times.getStartNumber();
+		this.date = times.getDate();
+		this.time1 = times.getTime1();
+		this.time2 = times.getTime2();
+		this.riderNumber = times.getRiderNumber();
+		this.penalties1 = times.getPenalties1();
+		this.penalties2 = times.getPenalties2();
+		this.disqualified1 = times.isDisqualified1();
+		this.disqualified2 = times.isDisqualified2();
+		this.registered = times.isRegistered();
+		this.country = times.getCountry();
+		this.timeStamp = times.getTimeStamp();
+		this.season = times.getSeason();
 	}
 
 	public int get_id() {
@@ -306,7 +328,11 @@ public class Times {
 	}
 
 	public boolean newerThan(Times existingTimes) {
-		return timeStamp >= existingTimes.getTimeStamp();
+		boolean b = timeStamp > existingTimes.getTimeStamp();
+
+		log.debug(dateFormat.format(timeStamp) + " newer than "
+				+ dateFormat.format(existingTimes.getTimeStamp()) + " " + b);
+		return b;
 	}
 
 	private long getTimeStamp() {
@@ -334,24 +360,6 @@ public class Times {
 		this.date = date;
 	}
 
-	@Override
-	public boolean equals(Object other) {
-
-		if (!(other instanceof Times)) {
-			return false;
-		}
-
-		Times otherTimes = (Times) other;
-
-		return otherTimes.getDate() == date && rider != null && otherTimes.getRider() != null
-				&& otherTimes.getRider().getRiderNumber() == rider.getRiderNumber();
-	}
-
-	@Override
-	public int hashCode() {
-		return new HashCodeBuilder(17, 37).append(date).toHashCode();
-	}
-
 	public Country getCountry() {
 		return country;
 	}
@@ -370,5 +378,13 @@ public class Times {
 
 	public int getRiderNumber() {
 		return riderNumber;
+	}
+
+	public boolean has_id() {
+		return _id != 0;
+	}
+
+	public String toString() {
+		return _id + " " + country.name() + " " + season + " " + date;
 	}
 }

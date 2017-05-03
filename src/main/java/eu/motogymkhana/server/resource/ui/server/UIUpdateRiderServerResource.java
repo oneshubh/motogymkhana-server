@@ -9,12 +9,12 @@ import org.restlet.resource.Post;
 import org.restlet.resource.ServerResource;
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 
 import eu.motogymkhana.server.api.request.UpdateRiderRequest;
-import eu.motogymkhana.server.api.response.UpdateRiderResponse;
+import eu.motogymkhana.server.api.response.UpdateRegistrationResponse;
 import eu.motogymkhana.server.dao.RiderDao;
 import eu.motogymkhana.server.password.PasswordManager;
+import eu.motogymkhana.server.persist.MyEntityManager;
 import eu.motogymkhana.server.resource.ui.UIUpdateRiderResource;
 
 public class UIUpdateRiderServerResource extends ServerResource implements UIUpdateRiderResource {
@@ -23,7 +23,7 @@ public class UIUpdateRiderServerResource extends ServerResource implements UIUpd
 	private PasswordManager passwordManager;
 
 	@Inject
-	private Provider<EntityManager> emp;
+	private MyEntityManager emp;
 
 	@Inject
 	private RiderDao riderDao;
@@ -35,9 +35,9 @@ public class UIUpdateRiderServerResource extends ServerResource implements UIUpd
 
 	@Override
 	@Post
-	public UpdateRiderResponse updateRider(UpdateRiderRequest request) {
+	public UpdateRegistrationResponse updateRider(UpdateRiderRequest request) {
 
-		UpdateRiderResponse response = new UpdateRiderResponse();
+		UpdateRegistrationResponse response = new UpdateRegistrationResponse();
 		response.setStatus(-1);
 
 		if (request.getRider() == null
@@ -46,7 +46,8 @@ public class UIUpdateRiderServerResource extends ServerResource implements UIUpd
 			return response;
 		}
 
-		EntityManager em = emp.get();
+		EntityManager em = emp.getEM();
+		em.clear();
 		em.getTransaction().begin();
 
 		try {

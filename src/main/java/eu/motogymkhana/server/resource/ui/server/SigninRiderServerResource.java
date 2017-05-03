@@ -16,12 +16,12 @@ import org.restlet.resource.Post;
 import org.restlet.resource.ServerResource;
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 
 import eu.motogymkhana.server.api.request.SigninRiderRequest;
 import eu.motogymkhana.server.api.result.RegisterRiderResult;
 import eu.motogymkhana.server.api.result.SigninRiderResult;
 import eu.motogymkhana.server.password.PasswordManager;
+import eu.motogymkhana.server.persist.MyEntityManager;
 import eu.motogymkhana.server.resource.ui.SigninRiderResource;
 
 public class SigninRiderServerResource extends ServerResource implements SigninRiderResource {
@@ -30,7 +30,7 @@ public class SigninRiderServerResource extends ServerResource implements SigninR
 	private PasswordManager passwordManager;
 
 	@Inject
-	private Provider<EntityManager> emp;
+	private MyEntityManager emp;
 
 	@Override
 	public void init(Context context, Request request, Response response) {
@@ -45,7 +45,8 @@ public class SigninRiderServerResource extends ServerResource implements SigninR
 		result.setResultCode(-1);
 		boolean check = false;
 
-		EntityManager em = emp.get();
+		EntityManager em = emp.getEM();
+		em.clear();
 
 		em.getTransaction().begin();
 

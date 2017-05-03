@@ -34,6 +34,7 @@ import eu.motogymkhana.server.persist.PersistenceInitializer;
 import eu.motogymkhana.server.properties.GymkhanaProperties;
 import eu.motogymkhana.server.resource.server.CheckPasswordServerResource;
 import eu.motogymkhana.server.resource.server.DeleteRiderServerResource;
+import eu.motogymkhana.server.resource.server.GetAllRidersServerResource;
 import eu.motogymkhana.server.resource.server.GetRidersServerResource;
 import eu.motogymkhana.server.resource.server.GetRoundsServerResource;
 import eu.motogymkhana.server.resource.server.GetSettingsServerResource;
@@ -44,15 +45,12 @@ import eu.motogymkhana.server.resource.server.UpdateTextServerResource;
 import eu.motogymkhana.server.resource.server.UpdateTimesServerResource;
 import eu.motogymkhana.server.resource.server.UploadRidersServerResource;
 import eu.motogymkhana.server.resource.server.UploadRoundsServerResource;
-import eu.motogymkhana.server.resource.ui.RegisterRiderResource;
-import eu.motogymkhana.server.resource.ui.SendRiderTokenResource;
-import eu.motogymkhana.server.resource.ui.server.RegisterRiderServerResource;
+import eu.motogymkhana.server.resource.ui.server.RegisterUserServerResource;
 import eu.motogymkhana.server.resource.ui.server.SendRiderTokenServerResource;
 import eu.motogymkhana.server.resource.ui.server.ShowRidersServerResource;
 import eu.motogymkhana.server.resource.ui.server.SigninRiderServerResource;
 import eu.motogymkhana.server.resource.ui.server.UIGetRiderServerResource;
 import eu.motogymkhana.server.resource.ui.server.UIUpdateRiderServerResource;
-import eu.motogymkhana.server.timer.TimerManager;
 
 public class GymkhanaServer extends Application {
 
@@ -103,6 +101,7 @@ public class GymkhanaServer extends Application {
 		router.attach(ServerConstants.UPDATE_TIMES, ff.finder(UpdateTimesServerResource.class));
 		router.attach(ServerConstants.DELETE_RIDER, ff.finder(DeleteRiderServerResource.class));
 		router.attach(ServerConstants.GET_RIDERS, ff.finder(GetRidersServerResource.class));
+		router.attach(ServerConstants.GET_ALL_RIDERS, ff.finder(GetAllRidersServerResource.class));
 		router.attach(ServerConstants.UPLOAD_RIDERS, ff.finder(UploadRidersServerResource.class));
 		router.attach(ServerConstants.UPDATE_RIDERS, ff.finder(UpdateRidersServerResource.class));
 		router.attach(ServerConstants.UPDATE_TEXT, ff.finder(UpdateTextServerResource.class));
@@ -114,7 +113,7 @@ public class GymkhanaServer extends Application {
 		router.attach(ServerConstants.UI_GET_ROUNDS, ff.finder(GetRoundsServerResource.class));
 		router.attach(ServerConstants.UI_GET_SETTINGS, ff.finder(GetSettingsServerResource.class));
 		router.attach(ServerConstants.UI_SEND_TOKEN, ff.finder(SendRiderTokenServerResource.class));
-		router.attach(ServerConstants.UI_REGISTER_RIDER, ff.finder(RegisterRiderServerResource.class));
+		router.attach(ServerConstants.UI_REGISTER_RIDER, ff.finder(RegisterUserServerResource.class));
 		router.attach(ServerConstants.UI_SIGNIN_RIDER, ff.finder(SigninRiderServerResource.class));
 		router.attach(ServerConstants.UI_GET_RIDER, ff.finder(UIGetRiderServerResource.class));
 		router.attach(ServerConstants.UI_UPDATE_RIDER, ff.finder(UIUpdateRiderServerResource.class));
@@ -123,8 +122,6 @@ public class GymkhanaServer extends Application {
 		mainComponent.start();
 
 		replaceConverter(JacksonConverter.class, new MyJacksonConverter());
-
-		injector.getInstance(TimerManager.class).init();
 	}
 
 	public static void main(final String[] args) throws Exception {

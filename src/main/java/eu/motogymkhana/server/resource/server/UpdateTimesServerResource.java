@@ -13,20 +13,15 @@ import org.restlet.Context;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.resource.Post;
-import org.restlet.resource.Put;
 import org.restlet.resource.ServerResource;
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 
-import eu.motogymkhana.server.api.request.UpdateRiderRequest;
 import eu.motogymkhana.server.api.request.UpdateTimesRequest;
-import eu.motogymkhana.server.api.response.UpdateRiderResponse;
-import eu.motogymkhana.server.dao.RiderDao;
+import eu.motogymkhana.server.api.response.UpdateRegistrationResponse;
 import eu.motogymkhana.server.dao.TimesDao;
-import eu.motogymkhana.server.model.Rider;
 import eu.motogymkhana.server.password.PasswordManager;
-import eu.motogymkhana.server.resource.UpdateRiderResource;
+import eu.motogymkhana.server.persist.MyEntityManager;
 import eu.motogymkhana.server.resource.UpdateTimesResource;
 
 public class UpdateTimesServerResource extends ServerResource implements UpdateTimesResource {
@@ -38,7 +33,7 @@ public class UpdateTimesServerResource extends ServerResource implements UpdateT
 	private PasswordManager pwManager;
 
 	@Inject
-	private Provider<EntityManager> emp;
+	private MyEntityManager emp;
 
 	@Override
 	public void init(Context context, Request request, Response response) {
@@ -47,16 +42,17 @@ public class UpdateTimesServerResource extends ServerResource implements UpdateT
 
 	@Override
 	@Post("json")
-	public UpdateRiderResponse updateTimes(UpdateTimesRequest request) {
+	public UpdateRegistrationResponse updateTimes(UpdateTimesRequest request) {
 
-		UpdateRiderResponse response = new UpdateRiderResponse();
+		UpdateRegistrationResponse response = new UpdateRegistrationResponse();
 		
 		if(!pwManager.checkPassword(request.getCountry(), request.getPassword())){	
 			response.setStatus(401);
 			return response;
 		}
 
-		EntityManager em = emp.get();
+		EntityManager em = emp.getEM();
+		em.clear();
 
 		em.getTransaction().begin();
 

@@ -13,5 +13,4 @@ import eu.motogymkhana.server.api.result.ListRidersResult;
 public interface ShowRidersResource {
 
 	ListRidersResult getRiders(GymkhanaRequest request);
-
 }

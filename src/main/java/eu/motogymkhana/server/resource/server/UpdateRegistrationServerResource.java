@@ -7,8 +7,6 @@
  *******************************************************************************/
 package eu.motogymkhana.server.resource.server;
 
-import java.util.Collection;
-
 import javax.persistence.EntityManager;
 
 import org.restlet.Context;
@@ -19,18 +17,20 @@ import org.restlet.resource.ServerResource;
 
 import com.google.inject.Inject;
 
-import eu.motogymkhana.server.api.request.GymkhanaRequest;
-import eu.motogymkhana.server.api.result.ListRidersResult;
-import eu.motogymkhana.server.api.result.ListRoundsResult;
-import eu.motogymkhana.server.model.Round;
+import eu.motogymkhana.server.api.request.UpdateRegistrationRequest;
+import eu.motogymkhana.server.api.response.UpdateRegistrationResponse;
+import eu.motogymkhana.server.dao.RegistrationDao;
+import eu.motogymkhana.server.password.PasswordManager;
 import eu.motogymkhana.server.persist.MyEntityManager;
-import eu.motogymkhana.server.resource.GetRoundsResource;
-import eu.motogymkhana.server.round.RoundManager;
+import eu.motogymkhana.server.resource.UpdateRegistrationResource;
 
-public class GetRoundsServerResource extends ServerResource implements GetRoundsResource {
+public class UpdateRegistrationServerResource extends ServerResource implements UpdateRegistrationResource {
 
 	@Inject
-	private RoundManager roundManager;
+	private RegistrationDao registrationDao;
+	
+	@Inject
+	private PasswordManager pwManager;
 
 	@Inject
 	private MyEntityManager emp;
@@ -41,14 +41,14 @@ public class GetRoundsServerResource extends ServerResource implements GetRounds
 	}
 
 	@Override
-	@Post
-	public ListRoundsResult getRounds(GymkhanaRequest request) {
+	@Post("json")
+	public UpdateRegistrationResponse updateRegistration(UpdateRegistrationRequest request) {
 
-		ListRoundsResult result = new ListRoundsResult();
-		result.setResultCode(-1);
+		UpdateRegistrationResponse response = new UpdateRegistrationResponse();
 		
-		if(request == null){
-			return result;
+		if(!pwManager.checkPassword(request.getCountry(), request.getPassword())){	
+			response.setStatus(404);
+			return response;
 		}
 
 		EntityManager em = emp.getEM();
@@ -57,11 +57,10 @@ public class GetRoundsServerResource extends ServerResource implements GetRounds
 		em.getTransaction().begin();
 
 		try {
-			Collection<Round> rounds = roundManager.getRounds(request.getCountry(),
-					request.getSeason());
 
-			result.setRounds(rounds);
-			result.setResultCode(ListRidersResult.OK);
+			int result = registrationDao.updateRegistration(request.getRegistration());
+
+			response.setStatus(result);
 
 			em.getTransaction().commit();
 
@@ -69,7 +68,8 @@ public class GetRoundsServerResource extends ServerResource implements GetRounds
 			e.printStackTrace();
 			em.getTransaction().rollback();
 		}
-		return result;
+
+		return response;
 	}
 
 }

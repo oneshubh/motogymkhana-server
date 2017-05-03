@@ -7,10 +7,11 @@
  *******************************************************************************/
 package eu.motogymkhana.server.resource.server;
 
-import java.util.Collection;
+import java.util.List;
 
 import javax.persistence.EntityManager;
 
+import org.apache.commons.logging.Log;
 import org.restlet.Context;
 import org.restlet.Request;
 import org.restlet.Response;
@@ -21,16 +22,31 @@ import com.google.inject.Inject;
 
 import eu.motogymkhana.server.api.request.GymkhanaRequest;
 import eu.motogymkhana.server.api.result.ListRidersResult;
-import eu.motogymkhana.server.api.result.ListRoundsResult;
-import eu.motogymkhana.server.model.Round;
+import eu.motogymkhana.server.conversion.ConvertRegistration;
+import eu.motogymkhana.server.dao.RegistrationDao;
+import eu.motogymkhana.server.dao.RiderDao;
+import eu.motogymkhana.server.guice.InjectLogger;
+import eu.motogymkhana.server.model.Rider;
 import eu.motogymkhana.server.persist.MyEntityManager;
-import eu.motogymkhana.server.resource.GetRoundsResource;
-import eu.motogymkhana.server.round.RoundManager;
+import eu.motogymkhana.server.resource.GetAllRidersResource;
+import eu.motogymkhana.server.text.TextManager;
 
-public class GetRoundsServerResource extends ServerResource implements GetRoundsResource {
+public class GetAllRidersServerResource extends ServerResource implements GetAllRidersResource {
 
 	@Inject
-	private RoundManager roundManager;
+	private RiderDao riderDao;
+	
+	@Inject
+	private RegistrationDao registrationDao;
+
+	@Inject
+	private ConvertRegistration convert;
+
+	@Inject
+	private TextManager textManager;
+
+	@InjectLogger
+	private Log log;
 
 	@Inject
 	private MyEntityManager emp;
@@ -42,12 +58,17 @@ public class GetRoundsServerResource extends ServerResource implements GetRounds
 
 	@Override
 	@Post
-	public ListRoundsResult getRounds(GymkhanaRequest request) {
-
-		ListRoundsResult result = new ListRoundsResult();
-		result.setResultCode(-1);
+	public ListRidersResult getRiders(GymkhanaRequest request) {
 		
-		if(request == null){
+		if (registrationDao.isEmpty()) {
+			convert.initRegistrations();
+		}
+
+		ListRidersResult result = new ListRidersResult();
+		result.setResult(-1);
+		result.setText(textManager.getText());
+
+		if (request == null) {
 			return result;
 		}
 
@@ -57,11 +78,11 @@ public class GetRoundsServerResource extends ServerResource implements GetRounds
 		em.getTransaction().begin();
 
 		try {
-			Collection<Round> rounds = roundManager.getRounds(request.getCountry(),
-					request.getSeason());
 
-			result.setRounds(rounds);
-			result.setResultCode(ListRidersResult.OK);
+			List<Rider> riders = riderDao.getAllRiders();
+			result.setRiders(riders);
+
+			result.setResult(ListRidersResult.OK);
 
 			em.getTransaction().commit();
 
@@ -71,5 +92,4 @@ public class GetRoundsServerResource extends ServerResource implements GetRounds
 		}
 		return result;
 	}
-
 }

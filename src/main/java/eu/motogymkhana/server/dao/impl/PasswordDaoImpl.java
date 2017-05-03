@@ -15,29 +15,29 @@ import javax.persistence.TypedQuery;
 import org.apache.commons.logging.Log;
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 
 import eu.motogymkhana.server.dao.PasswordDao;
 import eu.motogymkhana.server.guice.InjectLogger;
 import eu.motogymkhana.server.model.Country;
 import eu.motogymkhana.server.model.Password;
+import eu.motogymkhana.server.persist.MyEntityManager;
 
 public class PasswordDaoImpl implements PasswordDao {
 
 	@InjectLogger
 	private Log log;
 
-	private Provider<EntityManager> emp;
+	private MyEntityManager emp;
 
 	@Inject
-	public PasswordDaoImpl(Provider<EntityManager> emp) {
+	public PasswordDaoImpl(MyEntityManager emp) {
 		this.emp = emp;
 	}
 
 	@Override
 	public boolean checkPasswordHash(Country country, String hash) {
 
-		EntityManager em = emp.get();
+		EntityManager em = emp.getEM();
 
 		TypedQuery<Password> query = em.createQuery(
 				"select a from " + Password.class.getSimpleName() + " a where "
@@ -52,7 +52,7 @@ public class PasswordDaoImpl implements PasswordDao {
 	@Override
 	public void store(Country country, String hash) {
 
-		EntityManager em = emp.get();
+		EntityManager em = emp.getEM();
 
 		em.getTransaction().begin();
 

@@ -22,7 +22,7 @@ import com.google.inject.persist.PersistService;
 public class PersistenceInitializer {
 
 	@Inject
-	PersistenceInitializer(PersistService service, Provider<EntityManager> emp) {
+	PersistenceInitializer(PersistService service, MyEntityManager emp) {
 
 		service.start();
 	}

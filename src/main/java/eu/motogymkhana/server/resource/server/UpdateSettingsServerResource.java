@@ -16,20 +16,18 @@ import org.restlet.resource.Post;
 import org.restlet.resource.ServerResource;
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 
 import eu.motogymkhana.server.api.request.UploadSettingsRequest;
 import eu.motogymkhana.server.api.response.UpdateSettingsResponse;
-import eu.motogymkhana.server.api.result.GymkhanaResult;
-import eu.motogymkhana.server.api.result.ListRidersResult;
 import eu.motogymkhana.server.dao.SettingsDao;
 import eu.motogymkhana.server.password.PasswordManager;
+import eu.motogymkhana.server.persist.MyEntityManager;
 import eu.motogymkhana.server.resource.UpdateSettingsResource;
 
 public class UpdateSettingsServerResource extends ServerResource implements UpdateSettingsResource {
 
 	@Inject
-	private Provider<EntityManager> emp;
+	private MyEntityManager emp;
 
 	@Inject
 	private SettingsDao settingsDao;
@@ -53,18 +51,19 @@ public class UpdateSettingsServerResource extends ServerResource implements Upda
 			return response;
 		}
 
-		emp.get().getTransaction().begin();
+		EntityManager em = emp.getEM();
+		em.clear();
 
 		try {
 			
 			settingsDao.store(request.getSettings());
-			emp.get().getTransaction().commit();
+			em.getTransaction().commit();
 			response.setStatus(200);
 			
 		} catch (Exception e) {
 			response.setStatus(500);
 			try {
-				emp.get().getTransaction().rollback();
+				em.getTransaction().rollback();
 			} catch (Exception ee) {
 			}
 		}

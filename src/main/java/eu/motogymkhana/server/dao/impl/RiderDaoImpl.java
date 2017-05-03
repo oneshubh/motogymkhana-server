@@ -17,92 +17,100 @@ import javax.persistence.TypedQuery;
 import org.apache.commons.logging.Log;
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 
 import eu.motogymkhana.server.dao.RiderDao;
 import eu.motogymkhana.server.guice.InjectLogger;
 import eu.motogymkhana.server.model.Country;
+import eu.motogymkhana.server.model.Registration;
 import eu.motogymkhana.server.model.Rider;
 import eu.motogymkhana.server.model.Round;
 import eu.motogymkhana.server.model.Times;
+import eu.motogymkhana.server.persist.MyEntityManager;
 
 public class RiderDaoImpl implements RiderDao {
 
 	@InjectLogger
 	private Log log;
 
-	private Provider<EntityManager> emp;
+	private MyEntityManager emp;
 
 	@Inject
-	public RiderDaoImpl(Provider<EntityManager> emp) {
+	public RiderDaoImpl(MyEntityManager emp) {
 		this.emp = emp;
 	}
 
 	@Override
-	public int updateRider(Rider rider) {
+	public Rider updateRider(Rider rider) {
 
-		EntityManager em = emp.get();
-		Rider existingRider = null;
+		EntityManager em = emp.getEM();
 
 		try {
 
-			TypedQuery<Rider> query = em
-					.createQuery(
-							"select a from "
-									+ Rider.class.getSimpleName()
-									+ " a where a.riderNumber = :number and a.country = :country and a.season = :season",
-							Rider.class);
+			if (rider.hasId()) {
 
-			try {
-				existingRider = query.setParameter("country", rider.getCountry())
-						.setParameter("season", rider.getSeason())
-						.setParameter("number", rider.getRiderNumber()).getSingleResult();
+				Rider existingRider = getRiderForRiderId(rider.getRiderId());
+				log.debug("update rider id " + rider.get_id() + " existingRider id "
+						+ existingRider.get_id());
+//				for (Times times : existingRider.getTimes()) {
+//					log.debug("times " + times.toString());
+//				}
 
-			} catch (NoResultException nre) {
-			}
+				existingRider.merge(rider, em);
 
-			if (existingRider == null) {
+				for (Times times : existingRider.getTimes()) {
+					log.debug("times after merge " + times.toString());
+				}
 
-				em.persist(rider);
+				return existingRider;
+
+			} else {
+
+				emp.getEM().persist(rider);
+				rider.setRiderId(Integer.toString(rider.get_id()));
+
+				if (rider.hasRegistrations()) {
+					for (Registration registration : rider.getRegistrations()) {
+						registration.setRider(rider);
+					}
+				}
 				for (Times t : rider.getTimes()) {
 					t.setRider(rider);
 				}
 
-			} else {
-
-				existingRider.merge(rider);
+				rider.setRiderId(Integer.toString(rider.get_id()));
+				return rider;
 			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			return -1;
+			return null;
+		}
+	}
+
+	private Rider getRiderForRiderId(String riderId) {
+
+		EntityManager em = emp.getEM();
+		Rider existingRider = null;
+
+		TypedQuery<Rider> query = em.createQuery("select a from " + Rider.class.getSimpleName()
+				+ " a where a." + Rider.RIDER_ID + " = :riderId ", Rider.class);
+
+		try {
+			existingRider = query.setParameter("riderId", riderId).getSingleResult();
+		} catch (NoResultException nre) {
 		}
 
-		return 0;
+		return existingRider;
 	}
 
 	@Override
 	public int uploadRiders(Country country, int season, List<Rider> riders) {
 
-		EntityManager em = emp.get();
-
 		try {
 
 			for (Rider rider : riders) {
-
-				Rider r = getRiderForNumber(country, season, rider.getRiderNumber());
-
-				if (r != null) {
-					em.remove(r);
-				}
-
-				for (Times t : rider.getTimes()) {
-					t.setRider(rider);
-				}
-
-				em.persist(rider);
+				updateRider(rider);
 			}
-
 			return 0;
 
 		} catch (Exception e) {
@@ -118,7 +126,6 @@ public class RiderDaoImpl implements RiderDao {
 		try {
 
 			for (Rider rider : riders) {
-
 				updateRider(rider);
 			}
 
@@ -134,15 +141,15 @@ public class RiderDaoImpl implements RiderDao {
 	@Override
 	public Rider getRiderForNumber(Country country, int season, int riderNumber) {
 
-		EntityManager em = emp.get();
+		EntityManager em = emp.getEM();
 		Rider existingRider = null;
 
-		TypedQuery<Rider> query = em
-				.createQuery(
-						"select a from "
-								+ Rider.class.getSimpleName()
-								+ " a where a.riderNumber = :number and a.country = :country and a.season = :season",
-						Rider.class);
+		TypedQuery<Rider> query = em.createQuery(
+				"select registration.rider from " + Registration.class.getSimpleName()
+						+ " a where registration." + Registration.NUMBER
+						+ " = :number and registration." + Registration.COUNTRY
+						+ " = :country and registration." + Registration.SEASON + " = :season",
+				Rider.class);
 
 		try {
 			existingRider = query.setParameter("country", country).setParameter("season", season)
@@ -155,19 +162,56 @@ public class RiderDaoImpl implements RiderDao {
 	}
 
 	@Override
-	public Rider getRiderByEmail(Country country, int season, String email) {
+	public Rider getRiderByEmail(String email) {
 
-		EntityManager em = emp.get();
+		EntityManager em = emp.getEM();
 		Rider existingRider = null;
 
-		TypedQuery<Rider> query = em.createQuery("select a from " + Rider.class.getSimpleName()
-				+ " a where a.email = :email and a.country = :country and a.season = :season",
+		TypedQuery<Rider> query = em.createQuery(
+				"select a from " + Rider.class.getSimpleName() + " a where a.email = :email ",
 				Rider.class);
 
 		try {
-			existingRider = query.setParameter("email", email).setParameter("country", country)
-					.setParameter("season", season).getSingleResult();
+			existingRider = query.setParameter("email", email).getSingleResult();
 		} catch (NoResultException nre) {
+		}
+
+		return existingRider;
+	}
+
+	@Override
+	public Rider getRegisteredRiderByName(Rider rider) {
+
+		EntityManager em = emp.getEM();
+		Rider existingRider = null;
+
+		TypedQuery<Rider> query = em.createQuery(
+				"select a from " + Rider.class.getSimpleName() + " a where a." + Rider.FIRSTNAME
+						+ " = :firstname and a." + Rider.LASTNAME + "= :lastname ",
+				Rider.class);
+
+		try {
+			List<Rider> existingRiders = query.setParameter("firstname", rider.getFirstName())
+					.setParameter("lastname", rider.getLastName()).getResultList();
+
+			for (Rider r : existingRiders) {
+				log.debug("riderdao : " + r.getFullName());
+				if (r.hasRegistrations()) {
+					if (existingRider == null) {
+						existingRider = r;
+						log.debug("riderdao : first registration " + r.getFullName());
+					} else {
+						for (Registration registration : r.getRegistrations()) {
+							log.debug("riderdao : add registration " + r.getFullName());
+							registration.setRider(existingRider);
+							existingRider.getRegistrations().add(registration);
+						}
+					}
+				}
+			}
+
+		} catch (NoResultException nre) {
+			return null;
 		}
 
 		return existingRider;
@@ -176,19 +220,24 @@ public class RiderDaoImpl implements RiderDao {
 	@Override
 	public List<Rider> getRiders(Country country, int year) {
 
-		EntityManager em = emp.get();
+		EntityManager em = emp.getEM();
 
-		TypedQuery<Rider> query = em.createQuery("select a from " + Rider.class.getSimpleName()
-				+ " a where a.country = :country and a.season = :season", Rider.class);
+		TypedQuery<Registration> query = em.createQuery(
+				"select registration from " + Registration.class.getSimpleName()
+						+ " registration where registration.country = :country and registration.season = :season",
+				Registration.class);
 
-		List<Rider> riders = query.setParameter("country", country).setParameter("season", year)
-				.getResultList();
+		List<Registration> registrations = query.setParameter("country", country)
+				.setParameter("season", year).getResultList();
 
 		List<Rider> result = new ArrayList<Rider>();
 
-		for (Rider r : riders) {
-			em.refresh(r);
-			result.add(r);
+		for (Registration r : registrations) {
+			if (r.getRider() != null) {
+				result.add(r.getRider());
+			} else {
+				log.debug("registration with no rider " + r.get_id());
+			}
 		}
 
 		return result;
@@ -196,37 +245,44 @@ public class RiderDaoImpl implements RiderDao {
 	}
 
 	@Override
+	public List<Rider> getAllRiders() {
+
+		EntityManager em = emp.getEM();
+
+		TypedQuery<Rider> query = em.createQuery(
+				"select a from " + Rider.class.getSimpleName()
+						+ " a where a.firstname is not null and a.lastname is not null",
+				Rider.class);
+
+		List<Rider> riders = query.getResultList();
+
+		return riders;
+	}
+
+	@Override
 	public int deleteRider(Rider rider) {
 
-		log.debug("Delete rider " + rider.getRiderNumber() + " " + rider.getFullName());
+		log.debug("Delete rider " + rider.get_id() + " " + rider.getFullName());
 
-		EntityManager em = emp.get();
+		EntityManager em = emp.getEM();
 
 		try {
 
-			TypedQuery<Rider> query = emp
-					.get()
-					.createQuery(
-							"select a from "
-									+ Rider.class.getSimpleName()
-									+ " a where a.riderNumber = :number and a.country = :country and a.season = :season",
-							Rider.class);
-			Rider existingRider = null;
+			Rider existingRider = getRider(rider);
 
-			try {
-				existingRider = query.setParameter("number", rider.getRiderNumber())
-						.setParameter("country", rider.getCountry())
-						.setParameter("season", rider.getSeason()).getSingleResult();
-
-			} catch (NoResultException nre) {
-			}
-			log.debug("Existing rider " + existingRider == null ? "null" : existingRider
-					.getFullName());
+			log.debug("Existing rider " + existingRider == null ? "null"
+					: existingRider.getFullName());
 
 			if (existingRider != null) {
 				if (existingRider.hasTimes()) {
 					for (Times times : existingRider.getTimes()) {
 						em.remove(times);
+					}
+				}
+
+				if (existingRider.hasRegistrations()) {
+					for (Registration registration : existingRider.getRegistrations()) {
+						em.remove(registration);
 					}
 				}
 
@@ -247,7 +303,7 @@ public class RiderDaoImpl implements RiderDao {
 
 		List<Rider> riders = new ArrayList<Rider>();
 
-		EntityManager em = emp.get();
+		EntityManager em = emp.getEM();
 
 		if (round == null) {
 			return riders;
@@ -255,19 +311,16 @@ public class RiderDaoImpl implements RiderDao {
 
 		try {
 
-			TypedQuery<Times> query = em
-					.createQuery(
-							"select a from "
-									+ Times.class.getSimpleName()
-									+ " a where a.registered = :registered and a.date = :date and a.country = :country and a.season = :season",
-							Times.class);
+			TypedQuery<Times> query = em.createQuery(
+					"select a from " + Times.class.getSimpleName()
+							+ " a where a.registered = :registered and a.date = :date and a.country = :country and a.season = :season",
+					Times.class);
 
 			Times times = null;
 
 			try {
 
-				times = query.setParameter("registered", true)
-						.setParameter("date", round.getDate())
+				times = query.setParameter("registered", true).setParameter("date", round.getDate())
 						.setParameter("country", round.getCountry())
 						.setParameter("season", round.getSeason()).getSingleResult();
 
@@ -283,5 +336,26 @@ public class RiderDaoImpl implements RiderDao {
 		}
 
 		return riders;
+	}
+
+	@Override
+	public Rider getRider(Rider rider) {
+
+		TypedQuery<Rider> query = emp.getEM().createQuery(
+				"select a from " + Rider.class.getSimpleName() + " a where a._id = :id ",
+				Rider.class);
+		Rider existingRider = null;
+
+		try {
+			existingRider = query.setParameter("id", rider.get_id()).getSingleResult();
+
+		} catch (NoResultException nre) {
+		}
+		return existingRider;
+	}
+
+	@Override
+	public void remove(Rider rider) {
+		emp.getEM().remove(rider);
 	}
 }

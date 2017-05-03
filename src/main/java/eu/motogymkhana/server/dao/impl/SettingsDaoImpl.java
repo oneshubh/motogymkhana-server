@@ -15,12 +15,11 @@ import javax.persistence.TypedQuery;
 import org.apache.commons.logging.Log;
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 
 import eu.motogymkhana.server.dao.SettingsDao;
 import eu.motogymkhana.server.guice.InjectLogger;
 import eu.motogymkhana.server.model.Country;
-import eu.motogymkhana.server.model.Round;
+import eu.motogymkhana.server.persist.MyEntityManager;
 import eu.motogymkhana.server.settings.Settings;
 
 public class SettingsDaoImpl implements SettingsDao {
@@ -28,21 +27,23 @@ public class SettingsDaoImpl implements SettingsDao {
 	@InjectLogger
 	private Log log;
 
-	private Provider<EntityManager> emp;
+	private MyEntityManager emp;
 
 	@Inject
-	public SettingsDaoImpl(Provider<EntityManager> emp) {
+	public SettingsDaoImpl(MyEntityManager emp) {
 		this.emp = emp;
 	}
 
 	@Override
 	public Settings getSettings(Country country, int season) {
 
-		EntityManager em = emp.get();
+		EntityManager em = emp.getEM();
 
-		TypedQuery<Settings> query = em.createQuery(
-				"select a from " + Settings.class.getSimpleName()
-						+ " a where a.season = :season and a.country = :country", Settings.class);
+		TypedQuery<Settings> query = em
+				.createQuery(
+						"select a from " + Settings.class.getSimpleName()
+								+ " a where a.season = :season and a.country = :country",
+						Settings.class);
 
 		List<Settings> result = query.setParameter("country", country)
 				.setParameter("season", season).getResultList();
@@ -56,10 +57,13 @@ public class SettingsDaoImpl implements SettingsDao {
 
 	@Override
 	public void store(Settings settings) {
+		
+		log.debug("SettingsDaoImpl " + settings.get_id() + " " + settings.getCountry() + " "
+				+ settings.getSeason());
 
 		Settings existingSettings = getSettings(settings.getCountry(), settings.getSeason());
 		if (existingSettings == null) {
-			emp.get().persist(settings);
+			emp.getEM().persist(settings);
 		} else {
 			existingSettings.merge(settings);
 		}

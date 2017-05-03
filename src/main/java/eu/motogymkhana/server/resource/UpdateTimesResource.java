@@ -8,9 +8,9 @@
 package eu.motogymkhana.server.resource;
 
 import eu.motogymkhana.server.api.request.UpdateTimesRequest;
-import eu.motogymkhana.server.api.response.UpdateRiderResponse;
+import eu.motogymkhana.server.api.response.UpdateRegistrationResponse;
 
 public interface UpdateTimesResource {
 
-	public UpdateRiderResponse updateTimes(UpdateTimesRequest request);
+	public UpdateRegistrationResponse updateTimes(UpdateTimesRequest request);
 }

@@ -18,7 +18,6 @@ import javax.persistence.TypedQuery;
 import org.apache.commons.logging.Log;
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 
 import eu.motogymkhana.server.dao.RoundDao;
 import eu.motogymkhana.server.dao.TimesDao;
@@ -26,17 +25,18 @@ import eu.motogymkhana.server.guice.InjectLogger;
 import eu.motogymkhana.server.model.Country;
 import eu.motogymkhana.server.model.Round;
 import eu.motogymkhana.server.model.Times;
+import eu.motogymkhana.server.persist.MyEntityManager;
 
 public class RoundDaoImpl implements RoundDao {
 
 	@InjectLogger
 	private Log log;
 
-	private Provider<EntityManager> emp;
+	private MyEntityManager emp;
 	private TimesDao timesDao;
 
 	@Inject
-	public RoundDaoImpl(Provider<EntityManager> emp, TimesDao timesDao) {
+	public RoundDaoImpl(MyEntityManager emp, TimesDao timesDao) {
 		this.emp = emp;
 		this.timesDao = timesDao;
 	}
@@ -63,7 +63,7 @@ public class RoundDaoImpl implements RoundDao {
 				return -1;
 			}
 
-			EntityManager em = emp.get();
+			EntityManager em = emp.getEM();
 
 			for (Round roundToDelete : existingRounds) {
 				removeTimes(roundToDelete.getCountry(), roundToDelete.getSeason(), roundToDelete.getDate());
@@ -77,7 +77,7 @@ public class RoundDaoImpl implements RoundDao {
 	private void removeTimes(Country country, int season, long date) {
 		List<Times> list = timesDao.getTimes(country, season, date);
 		if (list != null) {
-			EntityManager em = emp.get();
+			EntityManager em = emp.getEM();
 			for (Times t : list) {
 				em.remove(t);
 			}
@@ -87,12 +87,12 @@ public class RoundDaoImpl implements RoundDao {
 	@Override
 	public int store(Round round) {
 
-		EntityManager em = emp.get();
+		EntityManager em = emp.getEM();
 
 		try {
 
 			TypedQuery<Round> query = emp
-					.get()
+					.getEM()
 					.createQuery(
 							"select a from "
 									+ Round.class.getSimpleName()
@@ -134,7 +134,7 @@ public class RoundDaoImpl implements RoundDao {
 	@Override
 	public Collection<Round> getRounds(Country country, int season) {
 
-		EntityManager em = emp.get();
+		EntityManager em = emp.getEM();
 
 		TypedQuery<Round> query = em.createQuery("select a from " + Round.class.getSimpleName()
 				+ " a where a.season = :season and a.country = :country", Round.class);

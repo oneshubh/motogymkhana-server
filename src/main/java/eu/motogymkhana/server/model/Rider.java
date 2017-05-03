@@ -18,20 +18,26 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityManager;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NoResultException;
 import javax.persistence.OneToMany;
+import javax.persistence.Query;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import javax.persistence.TypedQuery;
 
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
@@ -60,6 +66,10 @@ public class Rider {
 	public static final String IMAGE_URL = "image_url";
 	public static final String BIKE_IMAGE_URL = "bike_image_url";
 	public static final String EMAIL = "email";
+	public static final String REGISTRATION = "registration";
+	public static final String RIDER_ID = "rider_id";
+	public static final String ANDROID_ID = "android_id";
+	public static final String HIDE_LASTNAME = "hide_lastname";
 
 	private static final int roundsCountingForSeasonResult = 6;
 
@@ -68,9 +78,35 @@ public class Rider {
 	@JsonIgnore
 	private int _id;
 
+	@JsonProperty(RIDER_ID)
+	@Column(name = RIDER_ID)
+	private String rider_id;
+
+	@JsonProperty(ANDROID_ID)
+	@Column(name = ANDROID_ID)
+	private String androidId;
+
+	@JsonProperty(REGISTRATION)
+	@JsonManagedReference
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+	protected Set<Registration> registrations;
+
+	@JsonProperty(TIMES)
+	@JsonManagedReference
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+	private Set<Times> timesList;
+
 	@JsonProperty(SEASON)
 	@Column(name = SEASON)
 	protected int season;
+
+	public int getSeason() {
+		return season;
+	}
+
+	public Country getCountry() {
+		return country;
+	}
 
 	@JsonProperty(COUNTRY)
 	@Column(name = COUNTRY)
@@ -98,13 +134,17 @@ public class Rider {
 
 	@JsonProperty(FIRSTNAME)
 	@Column(name = FIRSTNAME)
-	private String firstName;
+	private String firstname;
 
 	@JsonProperty(LASTNAME)
 	@Column(name = LASTNAME)
-	private String lastName;
+	private String lastname;
 
-	@JsonProperty(value = EMAIL, access = Access.WRITE_ONLY)
+	@JsonProperty(HIDE_LASTNAME)
+	@Column(name = HIDE_LASTNAME)
+	private Boolean hideLastname = false;
+
+	@JsonProperty(value = EMAIL)
 	@Column(name = EMAIL)
 	protected String email;
 
@@ -132,10 +172,6 @@ public class Rider {
 	@Column(name = TEXT)
 	private String text;
 
-	@JsonProperty(TIMES)
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
-	private Set<Times> timesList = new HashSet<Times>();
-
 	@Column(name = POINTS)
 	@JsonIgnore
 	private int totalPoints;
@@ -161,14 +197,14 @@ public class Rider {
 			String[] splitString = riderString.split(" ");
 
 			if (splitString.length > 0) {
-				firstName = splitString[1];
+				firstname = splitString[1];
 
 				if (splitString.length > 1) {
-					lastName = splitString[2];
+					lastname = splitString[2];
 				}
 			}
 			for (int i = 3; i < splitString.length; i++) {
-				lastName = lastName + " " + splitString[i];
+				lastname = lastname + " " + splitString[i];
 			}
 
 			riderNumber = Integer.parseInt(splitString[0]);
@@ -177,35 +213,17 @@ public class Rider {
 
 	public Rider(int number, String firstName, String lastName) {
 		riderNumber = number;
-		this.firstName = firstName;
-		this.lastName = lastName;
+		this.firstname = firstName;
+		this.lastname = lastName;
 	}
 
 	public Rider(RonaldRider rr, Country country, int season, int riderNumber) {
 		update(rr);
 		bib = Bib.Y;
-		this.country = country;
-		this.season = season;
+		// this.country = country;
+		// this.season = season;
 		this.riderNumber = riderNumber;
 		gender = Gender.F;
-	}
-
-	public Rider(Rider rider, Country country, int season, int riderNumber) {
-
-		firstName = rider.getFirstName();
-		lastName = rider.getLastName();
-		this.country = rider.getCountry();
-		nationality = rider.getNationality();
-		this.season = rider.getSeason();
-		gender = rider.getGender();
-		bib = rider.getBib();
-		this.season = season;
-		this.riderNumber = riderNumber;
-		email = rider.getEmail();
-		dateOfBirth = rider.getDoB();
-		bike = rider.getBike();
-		bikeImageUrl = rider.getBikeImageUrl();
-		text = rider.getText();
 	}
 
 	private String getText() {
@@ -220,10 +238,6 @@ public class Rider {
 		return bike;
 	}
 
-	private String getDoB() {
-		return dateOfBirth;
-	}
-
 	public String getEmail() {
 		return email;
 	}
@@ -233,11 +247,11 @@ public class Rider {
 	}
 
 	public String getFirstName() {
-		return firstName;
+		return firstname;
 	}
 
 	public String getLastName() {
-		return lastName;
+		return lastname;
 	}
 
 	@JsonIgnore
@@ -361,6 +375,7 @@ public class Rider {
 
 	public void addTimes(Times times) {
 		timesList.add(times);
+		times.setRider(this);
 	}
 
 	public int getTotalPoints() {
@@ -410,21 +425,8 @@ public class Rider {
 	}
 
 	public boolean isValid() {
-		return firstName != null && firstName.length() > 0 && lastName != null
-				&& lastName.length() > 0 && riderNumber > 0;
-	}
-
-	@Override
-	public boolean equals(Object other) {
-
-		if (other != null && other instanceof Rider) {
-
-			Rider otherRider = (Rider) other;
-			return otherRider.getRiderNumber() == riderNumber;
-
-		} else {
-			return false;
-		}
+		return firstname != null && firstname.length() > 0 && lastname != null
+				&& lastname.length() > 0 && riderNumber > 0;
 	}
 
 	@Override
@@ -445,21 +447,22 @@ public class Rider {
 		return gender;
 	}
 
-	public void merge(Rider rider) {
+	public void merge(Rider rider, EntityManager em) {
 
-		log.debug("xtien merge rider " + rider.getRiderNumber() + " " + rider.getFirstName() + " "
+		log.debug("xtien merge rider " + rider.get_id() + " " + rider.getFirstName() + " "
 				+ rider.getLastName());
 
-		firstName = rider.getFirstName();
-		lastName = rider.getLastName();
-		riderNumber = rider.getRiderNumber();
+		firstname = rider.getFirstName();
+		lastname = rider.getLastName();
 		totalPoints = rider.getTotalPoints();
 		dayRider = rider.isDayRider();
-		country = rider.getCountry();
 		nationality = rider.getNationality();
-		season = rider.getSeason();
 		gender = rider.getGender();
-		bib = rider.getBib();
+		hideLastname = rider.isHideLastname();
+		email = rider.getEmail();
+
+		mergeRegistrations(rider.getRegistrations(), em);
+		mergeTimes(rider.getTimes(), em);
 
 		if (rider.hasText()) {
 			text = rider.getText();
@@ -473,26 +476,78 @@ public class Rider {
 		if (rider.hasBikeImageUrl()) {
 			bikeImageUrl = rider.getBikeImageUrl();
 		}
+	}
 
-		log.debug("xtien existing size = " + timesList.size() + " new size = "
-				+ rider.getTimes().size());
+	public void mergeRegistrations(Collection<Registration> registrations, EntityManager em) {
+		log.debug("Merge registrations " + getFullName());
 
-		for (Times tRider : rider.getTimes()) {
-			log.debug("xtien loop " + tRider.getDate());
+		for (Registration registration : registrations) {
+			log.debug("mergeRegistrations " + getFullName() + " " + registration.getSeason() + " "
+					+ registration.getCountry());
+			boolean found = false;
+
+			for (Registration reg : this.registrations) {
+				if (reg.getSeason() == registration.getSeason()
+						&& reg.getCountry() == registration.getCountry()) {
+					found = true;
+					log.debug("found " + reg.getSeason() + " " + reg.getCountry());
+					reg.setRegistered(registration.isRegistered());
+					reg.setDayRider(registration.isDayRider());
+					reg.setBib(registration.getBib());
+				}
+			}
+
+			if (!found) {
+				Registration resultRegistration = null;
+
+				TypedQuery<Registration> query = em.createQuery(
+						"select a from " + Registration.class.getSimpleName()
+								+ " a where a.rider = :rider and a.season = :season and a.country = :country",
+						Registration.class);
+				query.setParameter("rider", this);
+				query.setParameter("season", registration.getSeason());
+				query.setParameter("country", registration.getCountry());
+
+				try {
+					resultRegistration = query.getSingleResult();
+
+				} catch (NoResultException nre) {
+				}
+
+				if (resultRegistration != null) {
+					em.remove(resultRegistration);
+				}
+
+				log.debug(
+						"new registration " + registration.get_id() + " " + registration.getSeason()
+								+ " " + registration.getCountry() + " " + getFullName());
+				registration.setRider(this);
+				em.persist(registration);
+				this.registrations.add(registration);
+				registration.setRider(this);
+				em.persist(registration);
+				this.registrations.add(registration);
+			}
+		}
+	}
+
+	public void mergeTimes(Collection<Times> newTimesList, EntityManager em) {
+		log.debug("merge Times ");
+
+		for (Times newTimes : newTimesList) {
 
 			boolean found = false;
 
-			for (Times t : timesList) {
-				log.debug("xtien loop " + tRider.getDate() + " " + t.getDate());
+			for (Times times : this.timesList) {
 
-				if (t.getDate() == tRider.getDate()) {
+				if (times.getDate() == newTimes.getDate()) {
 
-					log.debug("xtien found " + t.getDate() + " " + tRider.getDate());
+					log.debug("times found " + times.toString() + " " + newTimes.toString());
 
 					found = true;
 
-					if (tRider.newerThan(t)) {
-						t.merge(tRider);
+					if (newTimes.newerThan(times)) {
+						times.merge(newTimes);
 					}
 
 					break;
@@ -501,12 +556,39 @@ public class Rider {
 
 			if (!found) {
 
-				log.debug("xtien new " + tRider.getDate());
-				tRider.setRider(this);
-				timesList.add(tRider);
+				log.debug("new Times " + newTimes.getDate() + " " + getFullName() + " " + _id);
+				newTimes.setRider(this);
+				em.persist(newTimes);
+				this.timesList.add(newTimes);
 
+				TypedQuery<Times> query = em.createQuery(
+						"select a from " + Times.class.getSimpleName()
+								+ " a where a.rider = :rider and a.date = :date and a.season = :season and a.country = :country",
+						Times.class);
+				query.setParameter("rider", newTimes.getRider());
+				query.setParameter("country", newTimes.getCountry());
+				query.setParameter("season", newTimes.getSeason());
+				query.setParameter("date", newTimes.getDate());
+
+				List<Times> resultTimes = null;
+
+				try {
+					resultTimes = query.getResultList();
+				} catch (NoResultException nre) {
+
+				}
+
+				if (resultTimes != null && resultTimes.size() > 1) {
+					for (Times t : resultTimes) {
+						log.debug("result times found " + t.toString());
+					}
+				}
 			}
 		}
+	}
+
+	public Collection<Registration> getRegistrations() {
+		return registrations;
 	}
 
 	private String getImageUrl() {
@@ -533,18 +615,8 @@ public class Rider {
 		return nationality;
 	}
 
-	private Bib getBib() {
+	public Bib getBib() {
 		return bib;
-	}
-
-	public Country getCountry() {
-		return country;
-	}
-
-	@Override
-	public String toString() {
-		return Integer.toString(riderNumber) + " " + firstName + " " + lastName + getTime1() + " "
-				+ getTime2();
 	}
 
 	@JsonIgnore
@@ -565,22 +637,10 @@ public class Rider {
 		return timeStamp;
 	}
 
-	public int getSeason() {
-		return season;
-	}
-
-	public void setCountry(Country country) {
-		this.country = country;
-	}
-
-	public void setSeason(int season) {
-		this.season = season;
-	}
-
 	public void update(RonaldRider rr) {
 
-		firstName = rr.getFirstName();
-		lastName = rr.getLastName();
+		firstname = rr.getFirstName();
+		lastname = rr.getLastName();
 		email = rr.getEmail();
 		setNationality(rr.getCountry());
 		imageUrl = rr.getProfilePicture().replaceAll("\\\\", "");
@@ -600,7 +660,7 @@ public class Rider {
 	}
 
 	public String getFullName() {
-		return firstName + " " + lastName;
+		return firstname + " " + lastname;
 	}
 
 	public void setRiderNumber(int number) {
@@ -609,5 +669,73 @@ public class Rider {
 
 	public boolean hasEmail() {
 		return email != null;
+	}
+
+	@Override
+	public boolean equals(Object other) {
+
+		if (!(other instanceof Rider)) {
+			return false;
+		}
+		Rider otherRider = (Rider) other;
+
+		if (_id != 0 && _id == otherRider.get_id()) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public boolean hasRegistrations() {
+		return registrations != null && registrations.size() > 0;
+	}
+
+	public boolean hasProfile() {
+		return imageUrl != null && bikeImageUrl != null;
+	}
+
+	public void addProfile(Rider rider) {
+		imageUrl = rider.getImageUrl();
+		bikeImageUrl = rider.getBikeImageUrl();
+		text = rider.getText();
+	}
+
+	public boolean hasId() {
+		return rider_id != null;
+	}
+
+	public void setRiderId(String id) {
+		this.rider_id = id;
+	}
+
+	public String getRiderId() {
+		return rider_id;
+	}
+
+	public void nullTimes() {
+		this.timesList = null;
+	}
+
+	@Override
+	public String toString() {
+
+		String string = "";
+		for (Registration r : registrations) {
+			string += " " + r.getSeason();
+		}
+		for (Times t : timesList) {
+			string += " " + t.getSeason();
+		}
+
+		return Integer.toString(_id) + " " + firstname + " " + lastname + " " + getTime1() + " "
+				+ getTime2() + string;
+	}
+
+	public boolean isHideLastname() {
+		return hideLastname != null && hideLastname;
+	}
+
+	public void setLastName(String lastName) {
+		this.lastname = lastName;
 	}
 }
