@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015, 2016, Christine Karman
+ * Copyright (c) 2015, 2016, 2017, 2018 Christine Karman
  * This project is free software: you can redistribute it and/or modify it under the terms of
  * the Apache License, Version 2.0. You can find a copy of the license at
  * http://www. apache.org/licenses/LICENSE-2.0.
@@ -9,6 +9,7 @@ package eu.motogymkhana.server.resource.server;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -29,7 +30,9 @@ import eu.motogymkhana.server.dao.PasswordDao;
 import eu.motogymkhana.server.dao.RegistrationDao;
 import eu.motogymkhana.server.dao.RiderDao;
 import eu.motogymkhana.server.dao.SettingsDao;
+import eu.motogymkhana.server.dao.TimesDao;
 import eu.motogymkhana.server.guice.InjectLogger;
+import eu.motogymkhana.server.model.Country;
 import eu.motogymkhana.server.model.Registration;
 import eu.motogymkhana.server.model.Rider;
 import eu.motogymkhana.server.model.Times;
@@ -46,19 +49,13 @@ public class GetRidersServerResource extends ServerResource implements GetRiders
 	private RiderDao riderDao;
 
 	@Inject
-	private RegistrationDao registrationDao;
-
-	@Inject
-	private ConvertRegistration convert;
-
-	@Inject
 	private SettingsDao settingsDao;
 
 	@Inject
 	private TextManager textManager;
-
+	
 	@Inject
-	private PasswordManager passwordManager;
+	private TimesDao timesDao;
 
 	@InjectLogger
 	private Log log;
@@ -75,31 +72,17 @@ public class GetRidersServerResource extends ServerResource implements GetRiders
 	@Post
 	public ListRidersResult getRiders(GymkhanaRequest request) {
 
-		boolean isAdmin = false;
 		EntityManager em = emp.getEM();
 		em.clear();
-
-		if (request.hasPassword()) {
-			isAdmin = passwordManager.checkPassword(request.getCountry(), (request.getPassword()));
-		}
-
-		if (registrationDao.isEmpty()) {
-
-			try {
-
-				em.getTransaction().begin();
-				convert.initRegistrations();
-				em.getTransaction().commit();
-
-				em.clear();
-
-				em.getTransaction().begin();
-				convert.removeUnregisteredRiders();
-				em.getTransaction().commit();
-
-			} catch (Exception e) {
-				e.printStackTrace();
-				em.getTransaction().rollback();
+		
+		List<Rider> riders2015 = riderDao.getRiders(Country.NL, 2015);
+		for(Rider r : riders2015){
+			
+			List<Times> tList = timesDao.getTimesForRiderId(r.get_id());
+			for (Times tt : tList){
+				if(tt.getSeason() == 2015){
+					log.debug(r.getFullName()+" " + tt.getSeason() + " "+ tt.getBestTimeString());
+				}
 			}
 		}
 
@@ -112,6 +95,12 @@ public class GetRidersServerResource extends ServerResource implements GetRiders
 		try {
 
 			List<Rider> riders = riderDao.getRiders(request.getCountry(), request.getSeason());
+			
+			for (Rider rider : riders){
+				List<Times> timesL = new ArrayList<Times>();
+				timesL.addAll(rider.getTimes());
+				log.debug("number of times items " + timesL.size());
+			}
 
 			result.setRiders(riders);
 

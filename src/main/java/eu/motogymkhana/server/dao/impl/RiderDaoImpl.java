@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015, 2016, Christine Karman
+ * Copyright (c) 2015, 2016, 2017, 2018 Christine Karman
  * This project is free software: you can redistribute it and/or modify it under the terms of
  * the Apache License, Version 2.0. You can find a copy of the license at
  * http://www. apache.org/licenses/LICENSE-2.0.
@@ -48,12 +48,9 @@ public class RiderDaoImpl implements RiderDao {
 
 			if (rider.hasId()) {
 
-				Rider existingRider = getRiderForRiderId(rider.getRiderId());
+				Rider existingRider = getRiderForStringRiderId(rider.getRiderId());
 				log.debug("update rider id " + rider.get_id() + " existingRider id "
 						+ existingRider.get_id());
-//				for (Times times : existingRider.getTimes()) {
-//					log.debug("times " + times.toString());
-//				}
 
 				existingRider.merge(rider, em);
 
@@ -87,7 +84,8 @@ public class RiderDaoImpl implements RiderDao {
 		}
 	}
 
-	private Rider getRiderForRiderId(String riderId) {
+	@Override
+	public Rider getRiderForStringRiderId(String riderId) {
 
 		EntityManager em = emp.getEM();
 		Rider existingRider = null;
@@ -102,12 +100,28 @@ public class RiderDaoImpl implements RiderDao {
 
 		return existingRider;
 	}
+	
+	@Override
+	public Rider getRiderForIntRiderId(int _id) {
+
+		EntityManager em = emp.getEM();
+		Rider existingRider = null;
+
+		TypedQuery<Rider> query = em.createQuery("select a from " + Rider.class.getSimpleName()
+				+ " a where a." + Rider.ID + " = :_id ", Rider.class);
+
+		try {
+			existingRider = query.setParameter("_id", _id).getSingleResult();
+		} catch (NoResultException nre) {
+		}
+
+		return existingRider;
+	}
 
 	@Override
 	public int uploadRiders(Country country, int season, List<Rider> riders) {
 
 		try {
-
 			for (Rider rider : riders) {
 				updateRider(rider);
 			}
@@ -136,29 +150,6 @@ public class RiderDaoImpl implements RiderDao {
 		}
 
 		return -1;
-	}
-
-	@Override
-	public Rider getRiderForNumber(Country country, int season, int riderNumber) {
-
-		EntityManager em = emp.getEM();
-		Rider existingRider = null;
-
-		TypedQuery<Rider> query = em.createQuery(
-				"select registration.rider from " + Registration.class.getSimpleName()
-						+ " a where registration." + Registration.NUMBER
-						+ " = :number and registration." + Registration.COUNTRY
-						+ " = :country and registration." + Registration.SEASON + " = :season",
-				Rider.class);
-
-		try {
-			existingRider = query.setParameter("country", country).setParameter("season", season)
-					.setParameter("number", riderNumber).getSingleResult();
-
-		} catch (NoResultException nre) {
-		}
-
-		return existingRider;
 	}
 
 	@Override
