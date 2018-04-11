@@ -1,3 +1,6 @@
+# Notification #
+As I left the Motogymkhana Netherlands Society, that doesn't pay me for the service, I took the server at www.gymcomp.com down. I'm sorry.
+
 # motogymkhana time registration server #
 
 Server for the Moto Gymkhana android app for a national competition.
