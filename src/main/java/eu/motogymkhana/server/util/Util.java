@@ -52,10 +52,4 @@ public class Util {
 		return clazz.equals(String.class) || clazz.equals(boolean.class)
 				|| clazz.equals(long.class) || clazz.equals(int.class);
 	}
-	
-	public static String stacktraceToString(Exception e){
-		StringWriter errors = new StringWriter();
-		e.printStackTrace(new PrintWriter(errors));
-		return errors.toString();
-	}
 }

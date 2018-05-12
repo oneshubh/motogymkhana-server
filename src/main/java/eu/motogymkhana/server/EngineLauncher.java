@@ -10,15 +10,13 @@ package eu.motogymkhana.server;
 import org.apache.commons.daemon.Daemon;
 import org.apache.commons.daemon.DaemonContext;
 import org.apache.commons.daemon.DaemonInitException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 import eu.motogymkhana.server.util.Util;
 
-
 public class EngineLauncher implements Daemon {
 
-	private static final Log log = LogFactory.getLog(EngineLauncher.class);
+	private static final Logger log = Logger.getLogger(EngineLauncher.class);
 
 	private static GymkhanaServer gymkhana = null;
 
@@ -56,8 +54,7 @@ public class EngineLauncher implements Daemon {
 				gymkhana.startIt();
 
 			} catch (Exception e) {
-				log.error(Util.stacktraceToString(e));
-				e.printStackTrace();
+				log.error(e);
 			}
 		}
 	}
@@ -70,8 +67,7 @@ public class EngineLauncher implements Daemon {
 			try {
 				gymkhana.stop();
 			} catch (Exception e) {
-				log.error(Util.stacktraceToString(e));
-				e.printStackTrace();
+				log.error(e);
 			}
 
 			log.info("Engine stopped");
